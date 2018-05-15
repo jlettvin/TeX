@@ -42,6 +42,6 @@ window.onload = (function (win, doc) {
 
 	// -------------------------------------------------------------------------
 	// Load all the modules needed to transform markdown to HTML
-	//loadJS ('/js/wiki.js', loadedCall, doc.body);
+	loadJS ('/js/TeX.js', loadedCall, doc.body);
 
 })(window, document);
