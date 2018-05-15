@@ -13,6 +13,14 @@ window.onload = (function (win, doc) {
 		var head    = doc.head;
 		var sources = doc.getElementsByClassName ('TeX');
 
+		{ // reload button
+			var reload          = doc.createElement ('button');
+			reload.innerHTML    = 'reload';
+			reload.setAttribute ('onclick', 'location.reload(true)');
+			body.appendChild    (reload);
+			body.appendChild    (doc.createElement ('hr');
+		}
+
 		// source conversion
 		for (var source of sources) {
 			var target       = doc.createElement ('span');
@@ -20,13 +28,6 @@ window.onload = (function (win, doc) {
 			var content      = interpret (TeXsrc);
 			target.innerHTML = content;
 			body.appendChild (target);
-		}
-
-		{ // reload button
-			var reload          = doc.createElement ('button');
-			reload.innerHTML    = 'reload';
-			reload.setAttribute ('onclick', 'location.reload(true)');
-			body.appendChild    (reload);
 		}
 	} // TeX
 
