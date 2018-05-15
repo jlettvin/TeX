@@ -15,10 +15,11 @@ window.onload = (function (win, doc) {
 
 		{ // reload button
 			var reload          = doc.createElement ('button');
+			var hr              = doc.createElement ('hr');
 			reload.innerHTML    = 'reload';
 			reload.setAttribute ('onclick', 'location.reload(true)');
 			body.appendChild    (reload);
-			body.appendChild    (doc.createElement ('hr'));
+			body.appendChild    (hr);
 		}
 
 		// source conversion
