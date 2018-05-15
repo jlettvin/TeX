@@ -102,10 +102,12 @@ window.onload = (function (win, doc) {
 		if (page.numbers) {
 			var pageNumber    = "page " + page.number;
 			var X             =  0;
-			var pWidth        = 50;  // Text width of pageNumber (faked)
-			if      (page.align == 'C') { X = (paper.width - pWidth) / 2; }
-			else if (page.align == 'R') { X =  paper.width - pWidth;      }
-			else                        { X =  offset.X;                  }
+			var pWidth        = paper.width - 50;  // width of pageNumber (faked)
+
+			if      (page.align == 'C') { X = pWidth / 2; }
+			else if (page.align == 'R') { X = pWidth;     }
+			else                        { X =  offset.X;  }
+
 			page.ctx.fillText (pageNumber, X, offset.Y + padding.top);
 			offset.Y          = offset.Y + 2 * line.height;
 		}
