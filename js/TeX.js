@@ -1,18 +1,19 @@
 'use strict'
 
-
 window.onload = (function (win, doc) {
 
+	// Control variables
 	var paper    = { width: 785, height: 969 };
 	var margin   = { top: 50, bottom: 10, left: 10, right: 10 };
 	var border   = { top:  0, bottom:  0, left:  0, right:  0 };
 	var padding  = { top:  0, bottom:  3, left:  0, right:  0 };
-	var offset   = { X: 0, Y: 0 };
 	var font     = { size: 12, face: 'Arial' };
-	var page     = { number: 0, numbers: true, canvas: null, ctx: null };
+	var page     = { number: 0, numbers: true, canvas: null, ctx: null, align: 'C' };
 	var line     = { height: font.size + padding.top + padding.bottom, text: '' };
+	var offset   = { X: 0, Y: 0 };
 
 	// -------------------------------------------------------------------------
+	// Enable multi-line strings in older versions of ECMAscript (javascript)
 	doc.HEREDOC = doc.HEREDOC || function (f) {
 		return f.toString().split('\n').slice(1,-1).join('\n').normalize('NFC');
 	}; // HEREDOC
@@ -43,7 +44,7 @@ window.onload = (function (win, doc) {
 
 			raw (source);
 		}
-	}; // TeX
+	}; // doc.main
 
 	// -------------------------------------------------------------------------
 	// Interpret and render the TeX source.
@@ -61,7 +62,7 @@ window.onload = (function (win, doc) {
 				newPage ();
 			}
 		}
-	};
+	};  // TeX (content)
 
 	// -------------------------------------------------------------------------
 	// Display the source code being rendered.
@@ -69,28 +70,29 @@ window.onload = (function (win, doc) {
 		var target           = doc.createElement ('pre');
 		target.innerHTML     = content;
 		doc.body.appendChild (target);
-	};
+	};  // raw (content)
 
 	// -------------------------------------------------------------------------
 	// Create a new canvas and return it to be filled.
 	var newPage = function () {
-		page.canvas        = doc.createElement ('canvas');
+		var td             = doc.createElement      ('td'    );
+		var tr             = doc.createElement      ('tr'    );
+		var table          = doc.createElement      ('table' );
+
+		page.canvas        = doc.createElement      ('canvas');
 		page.ctx           = page.canvas.getContext ('2d');
-		var td             = doc.createElement ('td'    );
-		var tr             = doc.createElement ('tr'    );
-		var table          = doc.createElement ('table' );
 		table.setAttribute ('style', 'border: 1px solid black');
 
 		offset.X      = margin.left + border.left + padding.left;
 		offset.Y      = margin.top  + border.top  + padding.top;
-		page.ctx.font = '' + font.size + 'px ' + font.face;
+		page.ctx.font = ''          + font.size   + 'px '       + font.face;
 		page.number   = page.number + 1;
 
 		// Letter-size paper
 		page.canvas.width        = paper. width;
 		page.canvas.height       = paper.height;
-		page.canvas.setAttribute ("id", "page." + page.number);
-		page.canvas.setAttribute ("class", "page");
+		page.canvas.setAttribute ("id"   , "page." + page.number);
+		page.canvas.setAttribute ("class", "page"               );
 
 		td      .appendChild (page.canvas);
 		tr      .appendChild (td);
@@ -98,13 +100,17 @@ window.onload = (function (win, doc) {
 		doc.body.appendChild (table);
 
 		if (page.numbers) {
-			var pageNumber = "page " + page.number;
-			page.ctx.fillText (pageNumber, offset.X, offset.Y + padding.top);
-			offset.Y = offset.Y + line.height;
+			var pageNumber    = "page " + page.number;
+			var X             =  0;
+			var pWidth        = 50;  // Text width of pageNumber (faked)
+			if      (page.align == 'C') { X = (paper.width - pWidth) / 2; }
+			else if (page.align == 'R') { X =  paper.width - pWidth;      }
+			else                        { X =  offset.X;                  }
+			page.ctx.fillText (pageNumber, X, offset.Y + padding.top);
+			offset.Y          = offset.Y + 2 * line.height;
 		}
 
 		return page.canvas;
-	};
-
+	};  // newPage ()
 
 })(window, document);
