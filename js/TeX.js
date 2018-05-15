@@ -26,8 +26,8 @@ window.onload = (function (win, doc) {
 		for (var source of sources) {
 			//var target       = doc.createElement ('span');
 			var TeXsrc       = source.innerHTML;
-			var content      = interpret (TeXsrc);
-			target.innerHTML = content;
+			var target       = interpret (TeXsrc);
+			//target.innerHTML = content;
 			body.appendChild (target);
 		}
 	} // TeX
