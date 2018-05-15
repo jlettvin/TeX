@@ -3,6 +3,8 @@
 
 window.onload = (function (win, doc) {
 
+	doc.jlettvin = doc.jlettvin || {};
+
 	// -------------------------------------------------------------------------
 	var TeX = function () {
 		const fmt = '<hr /><small><small>[{}]</small></small><br />';
@@ -15,7 +17,7 @@ window.onload = (function (win, doc) {
 			var target       = doc.createElement ('span');
 			var TeXsrc       = source.innerHTML;
 			var title        = source.id ? fmt.replace ('{}', source.id) : "";
-			var content      = doc.jlettvin.wiki.TeXsrc (TeXsrc);
+			var content      = doc.jlettvin.TeX.TeXsrc (TeXsrc);
 			target.innerHTML = title + content;
 			body.appendChild (target);
 		}
