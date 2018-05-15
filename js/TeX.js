@@ -18,7 +18,7 @@ window.onload = (function (win, doc) {
 			reload.innerHTML    = 'reload';
 			reload.setAttribute ('onclick', 'location.reload(true)');
 			body.appendChild    (reload);
-			body.appendChild    (doc.createElement ('hr');
+			body.appendChild    (doc.createElement ('hr'));
 		}
 
 		// source conversion
