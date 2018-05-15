@@ -19,7 +19,9 @@ and browsing to:
 
 # index.html:
 
-
+____
+# Before TeX data
+____
     <!DOCTYPE html>
     <html lang="en">
       <head>
@@ -30,6 +32,9 @@ and browsing to:
       <body><h1>TeX 19</h1></body>
     	<script type="text/javascript">
     	document.TeX (document.HEREDOC(function() {/*
+____
+# TeX data
+____
     \documentclass[12pt]{article}
     
     \begin{document}
@@ -63,7 +68,10 @@ and browsing to:
      original text in the .tex file is a mess. 
      
     \end{document} 
+____
+# After TeX data
+____
     */}));
     	</script>
     </html>
-    
+____
