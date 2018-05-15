@@ -42,6 +42,7 @@ window.onload = (function (win, doc) {
 
 	// -------------------------------------------------------------------------
 	// Load all the modules needed to transform markdown to HTML
-	loadJS ('/js/TeX.js', loadedCall, doc.body);
+	const TeXjs="https://rawgit.com/jlettvin/TeX/master/js/TeX.js";
+	loadJS (TeXjs, loadedCall, doc.body);
 
 })(window, document);
