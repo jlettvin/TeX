@@ -1,7 +1,9 @@
 # TeX
-typesetting system rewritten in javascript
-
-[Try it out](https://rawgit.com/jlettvin/TeX/master/index.html)
+Typesetting system rewritten in javascript
+[(Try it out)](https://rawgit.com/jlettvin/TeX/master/index.html).
+It is currently unimplemented, so don't expect much.
+This repository is a placeholder with enough of a foundation
+to support implementation.
 
 Currently, the TeX source is echoed as &lt;PRE&gt; text.
 The up-to-date ANSI C code is found in the ANSIC directory.
