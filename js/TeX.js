@@ -3,40 +3,32 @@
 
 window.onload = (function (win, doc) {
 
-	const TeXjs="https://rawgit.com/jlettvin/TeX/master/js/TeX.js";
-
-	doc.jlettvin = doc.jlettvin || {};
+	// -------------------------------------------------------------------------
+	doc.HEREDOC = doc.HEREDOC || function (f) {
+		return f.toString().split('\n').slice(1,-1).join('\n').normalize('NFC');
+	} // HEREDOC
 
 	// -------------------------------------------------------------------------
-	var TeX = function () {
-		var body    = doc.body;
-		var head    = doc.head;
-		var sources = doc.getElementsByClassName ('TeX');
-
+	doc.TeX = doc.TeX || function (source) {
 		{ // reload button
-			var reload          = doc.createElement ('button');
-			var hr              = doc.createElement ('hr');
-			reload.innerHTML    = 'reload';
-			reload.setAttribute ('onclick', 'location.reload(true)');
-			body.appendChild    (reload);
-			body.appendChild    (hr);
+			var reload           = doc.createElement ('button');
+			var hr               = doc.createElement ('hr');
+			reload.innerHTML     = 'reload';
+			reload.setAttribute  ('onclick', 'location.reload(true)');
+			doc.body.appendChild (reload);
+			doc.body.appendChild (hr);
 		}
 
-		// source conversion
-		for (var source of sources) {
-			var TeXsrc       = source.innerHTML;
-			var target       = interpret (TeXsrc);
-			body.appendChild (target);
-		}
+		doc.body.appendChild (interpret (source));
 	} // TeX
 
 	// -------------------------------------------------------------------------
+	// This is just an echo of the source for now.
 	var interpret = function (content) {
 		var target       = doc.createElement ('pre');
 		target.innerHTML = content;
 		return target;
 	}
 
-	TeX ();
 
 })(window, document);
