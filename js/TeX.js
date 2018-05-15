@@ -24,10 +24,8 @@ window.onload = (function (win, doc) {
 
 		// source conversion
 		for (var source of sources) {
-			//var target       = doc.createElement ('span');
 			var TeXsrc       = source.innerHTML;
 			var target       = interpret (TeXsrc);
-			//target.innerHTML = content;
 			body.appendChild (target);
 		}
 	} // TeX
