@@ -8,3 +8,11 @@ The up-to-date ANSI C code is found in the ANSIC directory.
 This code will be converted to javascript and
 instead of rendering to paper equivalent postscript or PDF
 it will be rendered directly into an HTML5 canvas.
+
+It can be developed and used locally by running:
+
+    $ python -m SimpleHTTPServer
+
+and browsing to:
+
+	localhost:8000
