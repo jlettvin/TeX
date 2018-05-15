@@ -3,11 +3,12 @@
 
 window.onload = (function (win, doc) {
 
+	const TeXjs="https://rawgit.com/jlettvin/TeX/master/js/TeX.js";
+
 	doc.jlettvin = doc.jlettvin || {};
 
 	// -------------------------------------------------------------------------
 	var TeX = function () {
-		const fmt = '<hr /><small><small>[{}]</small></small><br />';
 		var body    = doc.body;
 		var head    = doc.head;
 		var sources = doc.getElementsByClassName ('TeX');
@@ -16,9 +17,8 @@ window.onload = (function (win, doc) {
 		for (var source of sources) {
 			var target       = doc.createElement ('span');
 			var TeXsrc       = source.innerHTML;
-			var title        = source.id ? fmt.replace ('{}', source.id) : "";
-			var content      = doc.jlettvin.TeX.TeXsrc (TeXsrc);
-			target.innerHTML = title + content;
+			var content      = interpret (TeXsrc);
+			target.innerHTML = content;
 			body.appendChild (target);
 		}
 
@@ -29,6 +29,10 @@ window.onload = (function (win, doc) {
 			body.appendChild    (reload);
 		}
 	} // TeX
+
+	// -------------------------------------------------------------------------
+	var interpret = function (content) {
+	}
 
 	// -------------------------------------------------------------------------
 	var loadJS = function (url, fun, loc) {
@@ -44,7 +48,6 @@ window.onload = (function (win, doc) {
 
 	// -------------------------------------------------------------------------
 	// Load all the modules needed to transform markdown to HTML
-	const TeXjs="https://rawgit.com/jlettvin/TeX/master/js/TeX.js";
 	loadJS (TeXjs, loadedCall, doc.body);
 
 })(window, document);
