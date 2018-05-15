@@ -20,7 +20,7 @@ and browsing to:
 # index.html:
 
 ____
-# Before TeX data
+### Before TeX data
 ____
     <!DOCTYPE html>
     <html lang="en">
@@ -33,7 +33,7 @@ ____
     	<script type="text/javascript">
     	document.TeX (document.HEREDOC(function() {/*
 ____
-# TeX data
+### TeX data
 ____
     \documentclass[12pt]{article}
     
@@ -69,7 +69,7 @@ ____
      
     \end{document} 
 ____
-# After TeX data
+### After TeX data
 ____
     */}));
     	</script>
