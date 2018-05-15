@@ -35,20 +35,6 @@ window.onload = (function (win, doc) {
 		return 'Interpreted TeX: "' + content + '"';
 	}
 
-	// -------------------------------------------------------------------------
-	var loadJS = function (url, fun, loc) {
-		var script                = doc.createElement ('script');
-		script.src                = url;
-		script.onload             = fun;
-		script.onreadystatechange = fun;
-		loc.appendChild           (script);
-	} // loadJS
-
-	// -------------------------------------------------------------------------
-	var loadedCall = function () { TeX (); }
-
-	// -------------------------------------------------------------------------
-	// Load all the modules needed to transform markdown to HTML
-	//loadJS (TeXjs, loadedCall, doc.body);
+	TeX ();
 
 })(window, document);
