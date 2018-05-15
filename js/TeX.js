@@ -23,7 +23,7 @@ window.onload = (function (win, doc) {
 
 		// source conversion
 		for (var source of sources) {
-			var target       = doc.createElement ('span');
+			//var target       = doc.createElement ('span');
 			var TeXsrc       = source.innerHTML;
 			var content      = interpret (TeXsrc);
 			target.innerHTML = content;
@@ -33,7 +33,9 @@ window.onload = (function (win, doc) {
 
 	// -------------------------------------------------------------------------
 	var interpret = function (content) {
-		return 'Interpreted TeX: "' + content + '"';
+		var target       = doc.createElement ('pre');
+		target.innerHTML = content;
+		return target;
 	}
 
 	TeX ();
