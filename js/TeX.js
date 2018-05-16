@@ -1,5 +1,12 @@
 'use strict'
 
+/*
+\documentclass[12pt]{article}
+\begin{document}
+Hello world.
+\end{document}
+ */
+
 window.onload = (function (win, doc) {
 
 	// Control variables
@@ -20,21 +27,21 @@ window.onload = (function (win, doc) {
 
 	// -------------------------------------------------------------------------
 	doc.main = doc.main || function (source) {
+		{ // rendering
+			var section          = doc.createElement ('h3');
+			section.innerHTML    = 'TeX (Rendered) (fake)';
+
+			//doc.body.appendChild (doc.createElement ('hr'));
+			TeX (source);
+			doc.body.appendChild (doc.createElement ('hr'));
+			doc.body.appendChild (section);
+		}
+
 		{ // reload button
 			var reload           = doc.createElement ('button');
 			reload.innerHTML     = 'reload';
 			reload.setAttribute  ('onclick', 'location.reload(true)');
 			doc.body.appendChild (reload);
-		}
-
-		{ // rendering
-			var section          = doc.createElement ('h3');
-			section.innerHTML    = 'TeX (Rendered) (fake)';
-			doc.body.appendChild (section);
-
-			doc.body.appendChild (doc.createElement ('hr'));
-			TeX (source);
-			doc.body.appendChild (doc.createElement ('hr'));
 		}
 
 		{ // source display
@@ -95,9 +102,9 @@ window.onload = (function (win, doc) {
 		page.canvas.setAttribute ("class", "page"               );
 
 		td      .appendChild (page.canvas);
-		tr      .appendChild (td);
-		table   .appendChild (tr);
-		doc.body.appendChild (table);
+		tr      .appendChild (td         );
+		table   .appendChild (tr         );
+		doc.body.appendChild (table      );
 
 		if (page.numbers) {
 			var pageNumber    = "page " + page.number;
