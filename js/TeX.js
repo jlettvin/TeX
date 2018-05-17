@@ -374,10 +374,9 @@ since DVI files used in production jobs tend to be large.
 			if (render.v >= maxY) {
 				newPage ();
 			}
-		} else {
-			render.h += h
 		}
 		page.ctx.fillText (c, render.h, render.v + padding.top);
+		render.h += h
 		//console.log ('render: ', c, render.h, render.v);
 	};  // OP_000_127 
 
