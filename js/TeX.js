@@ -17,7 +17,7 @@ window.onload = (function (win, doc) {
 	var font     = { size: 12, face: 'Arial' };
 	var page     = { number: 0, numbers: false, canvas: null, ctx: null, align: 'C' };
 	var line     = { height: font.size + padding.top + padding.bottom, text: '' };
-	var render   = { h: 0, v: 0, ok: true };
+	var render   = { h: 0, v: 0, source: '', target: '', index: 0, ok: true };
 
 	// -------------------------------------------------------------------------
 	var unimplemented = function (subsystem, name) {
@@ -29,49 +29,31 @@ window.onload = (function (win, doc) {
 	// Enable multi-line strings in older versions of ECMAscript (javascript)
 	doc.HEREDOC = doc.HEREDOC || function (f) {
 		return f.toString().split('\n').slice(1,-1).join('\n').normalize('NFC');
-	}; // HEREDOC
+	};  // HEREDOC
 
 	// -------------------------------------------------------------------------
 	doc.main = doc.main || function (source) {
-		{ // rendering
-			var section          = doc.createElement ('h3');
-			section.innerHTML    = 'TeX (Rendered) (fake)';
-
-			//doc.body.appendChild (doc.createElement ('hr'));
-			TeX (source);
-			doc.body.appendChild (doc.createElement ('hr'));
-			doc.body.appendChild (section);
+		render.source = source;
+		for (var f of [TeX, DVI, reload, raw]) {
+			if (!render.ok) break; else
+			f ();
 		}
-
-		{ // reload button
-			var reload           = doc.createElement ('button');
-			reload.innerHTML     = 'reload';
-			reload.setAttribute  ('onclick', 'location.reload(true)');
-			doc.body.appendChild (reload);
-		}
-
-		{ // source display
-			var section = doc.createElement ('h3');
-			section.innerHTML = 'TeX (Raw)';
-			doc.body.appendChild (section);
-
-			raw (source);
-		}
-	}; // doc.main
+	};  // doc.main
 
 	// -------------------------------------------------------------------------
 	// Interpret and render the TeX source.
-	var TeX = function (content) {
+	var TeX = function () {
 		newPage ();
 		var bottom    = margin.bottom - border.bottom - padding .bottom;
 		var maxY      = paper.height - bottom;
-		var DVIbuffer = '';
 
-		unimplemented ('TeX', 'interpreter');
+		// Operate on render.source
+		//unimplemented ('TeX', 'interpreter');
+		render.target = render.source;  // Simply copy TeX into DVI
 
 		/*
 		// This is just an echo of the source for now.
-		for (line.text of content.split (/\r?\n/)) {
+		for (line.text of render.source.split (/\r?\n/)) {
 			page.ctx.fillText (line.text, render.h, render.v + padding.top);
 			// console.log (render.h, render.v, maxY);
 			render.v = render.v + line.height;
@@ -81,13 +63,30 @@ window.onload = (function (win, doc) {
 		}
 		*/
 
-		DVI (DVIbuffer);
 
 	};  // TeX (content)
 
 	// -------------------------------------------------------------------------
+	var reload = function () {
+		var section          = doc.createElement ('h3');
+		section.innerHTML    = 'TeX (Rendered) (fake)';
+		doc.body.appendChild (doc.createElement ('hr'));
+		doc.body.appendChild (section);
+
+		var reload           = doc.createElement ('button');
+		reload.innerHTML     = 'reload';
+		reload.setAttribute  ('onclick', 'location.reload(true)');
+		doc.body.appendChild (reload);
+	};  // reload ();
+
+	// -------------------------------------------------------------------------
 	// Display the source code being rendered.
-	var raw = function (content) {
+	var raw = function () {
+		var content = render.source;
+		var section = doc.createElement ('h3');
+		section.innerHTML = 'TeX (Raw)';
+		doc.body.appendChild (section);
+
 		var target           = doc.createElement ('pre');
 		target.innerHTML     = content;
 		doc.body.appendChild (target);
@@ -105,6 +104,7 @@ window.onload = (function (win, doc) {
 
 		render.h      = margin.left + border.left + padding.left;
 		render.v      = margin.top  + border.top  + padding.top;
+		console.log ('newPage', render.h, render.v);
 		page.ctx.font = ''          + font.size   + 'px '       + font.face;
 		page.number   = page.number + 1;
 
@@ -358,122 +358,141 @@ since DVI files used in production jobs tend to be large.
 	 */
 
 	// -------------------------------------------------------------------------
-	var OP_000_127 = function (buffer) {
-		unimplemented ('DVI', 'OP_000_127'); return 0;
+	var OP_000_127 = function () {
+		var bottom    = margin.bottom - border.bottom - padding .bottom;
+		var maxY      = paper.height - bottom;
+		var c = render.target[render.index++];
+		var metrics = page.ctx.measureText (c);
+		// These parseInts screw up the display.  Fix them.
+		//var h = parseInt (metrics.width + 0.9999999);
+		//var H = parseInt (render.h + h);
+		var h = metrics.width;
+		var H = render.h + h;
+		if (H >= paper.width || c == '\n') {
+			render.h = margin.left + border.left + padding.left;
+			render.v += font.size + padding.bottom + padding.top;
+			if (render.v >= maxY) {
+				newPage ();
+			}
+		} else {
+			render.h += h
+		}
+		page.ctx.fillText (c, render.h, render.v + padding.top);
+		//console.log ('render: ', c, render.h, render.v);
 	};  // OP_000_127 
 
 	// -------------------------------------------------------------------------
-	var OP_128_131 = function (buffer) {
+	var OP_128_131 = function () {
 		unimplemented ('DVI', 'OP_128_131'); return 0;
 	};  // OP_000_127 
 
 	// -------------------------------------------------------------------------
-	var OP_128_131 = function (buffer) {
+	var OP_128_131 = function () {
 		unimplemented ('DVI', 'OP_128_131'); return 0;
 	};  // OP_128_131 
 
 	// -------------------------------------------------------------------------
-	var OP_132_132 = function (buffer) {
+	var OP_132_132 = function () {
 		unimplemented ('DVI', 'OP_132_132'); return 0;
 	};  // OP_132_132 
 
 	// -------------------------------------------------------------------------
-	var OP_133_136 = function (buffer) {
+	var OP_133_136 = function () {
 		unimplemented ('DVI', 'OP_133_136'); return 0;
 	};  // OP_133_136 
 
 	// -------------------------------------------------------------------------
-	var OP_137_137 = function (buffer) {
+	var OP_137_137 = function () {
 		unimplemented ('DVI', 'OP_137_137'); return 0;
 	};  // OP_137_137 
 
 	// -------------------------------------------------------------------------
-	var OP_138_138 = function (buffer) {
+	var OP_138_138 = function () {
 		unimplemented ('DVI', 'OP_138_138'); return 0;
 	};  // OP_138_138 
 
 	// -------------------------------------------------------------------------
-	var OP_139_139 = function (buffer) {
+	var OP_139_139 = function () {
 		unimplemented ('DVI', 'OP_139_139'); return 0;
 	};  // OP_139_139 
 
 	// -------------------------------------------------------------------------
-	var OP_140_140 = function (buffer) {
+	var OP_140_140 = function () {
 		unimplemented ('DVI', 'OP_140_140'); return 0;
 	};  // OP_140_140 
 
 	// -------------------------------------------------------------------------
-	var OP_141_141 = function (buffer) {
+	var OP_141_141 = function () {
 		unimplemented ('DVI', 'OP_141_141'); return 0;
 	};  // OP_141_141 
 
 	// -------------------------------------------------------------------------
-	var OP_142_142 = function (buffer) {
+	var OP_142_142 = function () {
 		unimplemented ('DVI', 'OP_142_142'); return 0;
 	};  // OP_142_142 
 
 	// -------------------------------------------------------------------------
-	var OP_143_146 = function (buffer) {
+	var OP_143_146 = function () {
 		unimplemented ('DVI', 'OP_143_146'); return 0;
 	};  // OP_143_146 
 
 	// -------------------------------------------------------------------------
-	var OP_147_151 = function (buffer) {
+	var OP_147_151 = function () {
 		unimplemented ('DVI', 'OP_147_151'); return 0;
 	};  // OP_147_151 
 
 	// -------------------------------------------------------------------------
-	var OP_152_156 = function (buffer) {
+	var OP_152_156 = function () {
 		unimplemented ('DVI', 'OP_152_156'); return 0;
 	};  // OP_152_156 
 
 	// -------------------------------------------------------------------------
-	var OP_157_160 = function (buffer) {
+	var OP_157_160 = function () {
 		unimplemented ('DVI', 'OP_157_160'); return 0;
 	};  // OP_157_160 
 
 	// -------------------------------------------------------------------------
-	var OP_161_165 = function (buffer) {
+	var OP_161_165 = function () {
 		unimplemented ('DVI', 'OP_161_165'); return 0;
 	};  // OP_161_165 
 
 	// -------------------------------------------------------------------------
-	var OP_166_170 = function (buffer) {
+	var OP_166_170 = function () {
 		unimplemented ('DVI', 'OP_166_170'); return 0;
 	};  // OP_166_170 
 
 	// -------------------------------------------------------------------------
-	var OP_171_234 = function (buffer) {
+	var OP_171_234 = function () {
 		unimplemented ('DVI', 'OP_171_234'); return 0;
 	};  // OP_171_234 
 
 	// -------------------------------------------------------------------------
-	var OP_235_238 = function (buffer) {
+	var OP_235_238 = function () {
 		unimplemented ('DVI', 'OP_235_238'); return 0;
 	};  // OP_235_238 
 
 	// -------------------------------------------------------------------------
-	var OP_239_242 = function (buffer) {
+	var OP_239_242 = function () {
 		unimplemented ('DVI', 'OP_239_242'); return 0;
 	};  // OP_239_242 
 
 	// -------------------------------------------------------------------------
-	var OP_243_246 = function (buffer) {
+	var OP_243_246 = function () {
 		unimplemented ('DVI', 'OP_243_246'); return 0;
 	};  // OP_243_246 
 
 	// -------------------------------------------------------------------------
-	var OP_247_247 = function (buffer) {
+	var OP_247_247 = function () {
 		unimplemented ('DVI', 'OP_247_247'); return 0;
 	};  // OP_247_247 
 
 	// -------------------------------------------------------------------------
-	var OP_248_248 = function (buffer) {
+	var OP_248_248 = function () {
 		unimplemented ('DVI', 'OP_248_248'); return 0;
 	};  // OP_248_248 
 
 	// -------------------------------------------------------------------------
-	var OP_249_249 = function (buffer) {
+	var OP_249_249 = function () {
 		unimplemented ('DVI', 'OP_249_249'); return 0;
 	};  // OP_249_249 
 
@@ -496,15 +515,20 @@ since DVI files used in production jobs tend to be large.
 	for (var J = DVI_INIT.length, j = 0; j < J; ++j) {
 		var abc = DVI_INIT[j];
 		var a = abc[0], b = 1 + abc[1], c = abc[2];
-		for (var i=a; i < b; i++) OPCODE.push (c);
+		for (var i=a; i < b; i++) {
+			OPCODE.push (c);
+		}
 	}
 
 	// -------------------------------------------------------------------------
 	// Rendering engine for DVI language
-	var DVI = function (buffer) {
+	var DVI = function () {
+		var buffer = render.target;
 		var I = buffer.length;
-		for (var i = 0; i < I && render.ok; ) {
-			i = OPCODE[buffer[i]] (i, buffer);
+		for (render.index = 0; render.index < I && render.ok; ) {
+			var o = buffer.charCodeAt(render.index);
+			//console.log ('I: "' + buffer[i] + '"', o, OPCODE);
+			OPCODE[o] ();
 		}
 		return render.ok;
 	};  // DVI (buffer)
