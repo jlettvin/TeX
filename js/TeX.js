@@ -1,5 +1,7 @@
 'use strict'
 
+// TODO: Guarantee font-face loaded and cross-browser.
+
 /* DVI engine
 https://web.archive.org/web/20070403030353/\
 http://www.math.umd.edu/~asnowden/comp-cont/dvi.html
@@ -231,7 +233,7 @@ window.onload = (function (win, doc) {
 	var margin   = { top: 50, bottom: 10, left: 10, right: 10 };
 	var border   = { top:  0, bottom:  0, left:  0, right:  0 };
 	var padding  = { top:  0, bottom:  3, left:  0, right:  0 };
-	var font     = { size: 12, face: 'Arial' };
+	var font     = { size: 12, face: 'serif' };
 	var page     = { number: 0, numbers: false, canvas: null, ctx: null, align: 'C' };
 	var line     = { height: font.size + padding.top + padding.bottom, text: '' };
 	var render   = { h: 0, v: 0, source: '', target: '', index: 0, ok: true };
@@ -309,9 +311,10 @@ window.onload = (function (win, doc) {
 
 		render.h      = margin.left + border.left + padding.left;
 		render.v      = margin.top  + border.top  + padding.top;
-		console.log ('newPage', render.h, render.v);
 		page.ctx.font = ''          + font.size   + 'px '       + font.face;
 		page.number   = page.number + 1;
+
+		console.log ('newPage', render.h, render.v);
 
 		// Letter-size paper
 		page.canvas.width        = paper. width;
