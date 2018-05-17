@@ -7,6 +7,9 @@
     <style>
 table { border: 1px solid black; }
 @media print {
+	.no-print, -no-print * {
+		display: none !important;
+	}
 	table {
 		page-break-after: always;
 		border-collapse: collapse;

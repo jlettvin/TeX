@@ -251,7 +251,7 @@ window.onload = (function (win, doc) {
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	doc.main = doc.main || function (source) {
 		render.source = source;
-		for (var f of [TeX, DVI, reload, raw]) {
+		for (var f of [reload, TeX, DVI, raw]) {
 			if (!render.ok) break; else
 			f ();
 		}
@@ -273,12 +273,14 @@ window.onload = (function (win, doc) {
 	var reload = function () {
 		var section          = doc.createElement ('h3');
 		section.innerHTML    = 'TeX (Rendered) (fake)';
+		section.setAttribute  ('class', 'no-print');
 		doc.body.appendChild (doc.createElement ('hr'));
 		doc.body.appendChild (section);
 
 		var reload           = doc.createElement ('button');
 		reload.innerHTML     = 'reload';
 		reload.setAttribute  ('onclick', 'location.reload(true)');
+		reload.setAttribute  ('class', 'no-print');
 		doc.body.appendChild (reload);
 	};  // reload ();
 
