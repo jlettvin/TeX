@@ -344,8 +344,31 @@ window.onload = (function (win, doc) {
 		return page.canvas;
 	};  // newPage ()
 
+
+	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
+	var RENDER = function (c) {
+		var bottom    = margin.bottom - border.bottom - padding .bottom;
+		var maxY      = paper.height - bottom;
+		var metrics = page.ctx.measureText (c);
+		var h = metrics.width;
+		var H = render.h + h;
+		var newline = (c == '\n');  // This test parm is to be removed.
+		if (H >= paper.width || newline) {
+			render.h = margin.left + border.left + padding.left;
+			render.v += font.size + padding.bottom + padding.top;
+			if (render.v >= maxY) {
+				newPage ();
+			}
+		}
+		page.ctx.fillText (c, render.h, render.v + padding.top);
+		render.h += h
+	}
+
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_000_127 = function () {
+		var c = render.target[render.index++];
+		RENDER (c);
+		/*
 		var bottom    = margin.bottom - border.bottom - padding .bottom;
 		var maxY      = paper.height - bottom;
 		var c = render.target[render.index++];
@@ -362,167 +385,180 @@ window.onload = (function (win, doc) {
 		}
 		page.ctx.fillText (c, render.h, render.v + padding.top);
 		render.h += h
+		*/
 	};  // OP_000_127 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_128_131 = function () {
-		unimplemented ('DVI', 'OP_128_131'); return 0;
+		unimplemented ('DVI', 'OP_128_131');
 	};  // OP_000_127 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_128_131 = function () {
-		unimplemented ('DVI', 'OP_128_131'); return 0;
+		unimplemented ('DVI', 'OP_128_131');
 	};  // OP_128_131 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_132_132 = function () {
-		unimplemented ('DVI', 'OP_132_132'); return 0;
+		unimplemented ('DVI', 'OP_132_132');
 	};  // OP_132_132 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_133_136 = function () {
-		unimplemented ('DVI', 'OP_133_136'); return 0;
+		unimplemented ('DVI', 'OP_133_136');
 	};  // OP_133_136 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_137_137 = function () {
-		unimplemented ('DVI', 'OP_137_137'); return 0;
+		unimplemented ('DVI', 'OP_137_137');
 	};  // OP_137_137 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_138_138 = function () {
-		unimplemented ('DVI', 'OP_138_138'); return 0;
+		unimplemented ('DVI', 'OP_138_138');
 	};  // OP_138_138 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_139_139 = function () {
-		unimplemented ('DVI', 'OP_139_139'); return 0;
+		unimplemented ('DVI', 'OP_139_139');
 	};  // OP_139_139 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_140_140 = function () {
-		unimplemented ('DVI', 'OP_140_140'); return 0;
+		unimplemented ('DVI', 'OP_140_140');
 	};  // OP_140_140 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_141_141 = function () {
-		unimplemented ('DVI', 'OP_141_141'); return 0;
+		unimplemented ('DVI', 'OP_141_141');
 	};  // OP_141_141 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_142_142 = function () {
-		unimplemented ('DVI', 'OP_142_142'); return 0;
+		unimplemented ('DVI', 'OP_142_142');
 	};  // OP_142_142 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_143_146 = function () {
-		unimplemented ('DVI', 'OP_143_146'); return 0;
+		unimplemented ('DVI', 'OP_143_146');
 	};  // OP_143_146 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_147_151 = function () {
-		unimplemented ('DVI', 'OP_147_151'); return 0;
+		unimplemented ('DVI', 'OP_147_151');
 	};  // OP_147_151 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_152_156 = function () {
-		unimplemented ('DVI', 'OP_152_156'); return 0;
+		unimplemented ('DVI', 'OP_152_156');
 	};  // OP_152_156 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_157_160 = function () {
-		unimplemented ('DVI', 'OP_157_160'); return 0;
+		unimplemented ('DVI', 'OP_157_160');
 	};  // OP_157_160 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_161_165 = function () {
-		unimplemented ('DVI', 'OP_161_165'); return 0;
+		unimplemented ('DVI', 'OP_161_165');
 	};  // OP_161_165 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_166_170 = function () {
-		unimplemented ('DVI', 'OP_166_170'); return 0;
+		unimplemented ('DVI', 'OP_166_170');
 	};  // OP_166_170 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_171_234 = function () {
-		unimplemented ('DVI', 'OP_171_234'); return 0;
+		unimplemented ('DVI', 'OP_171_234');
 	};  // OP_171_234 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_235_238 = function () {
-		unimplemented ('DVI', 'OP_235_238'); return 0;
+		unimplemented ('DVI', 'OP_235_238');
 	};  // OP_235_238 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_239_242 = function () {
-		unimplemented ('DVI', 'OP_239_242'); return 0;
+		unimplemented ('DVI', 'OP_239_242');
 	};  // OP_239_242 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_243_246 = function () {
-		unimplemented ('DVI', 'OP_243_246'); return 0;
+		unimplemented ('DVI', 'OP_243_246');
 	};  // OP_243_246 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_247_247 = function () {
-		unimplemented ('DVI', 'OP_247_247'); return 0;
+		unimplemented ('DVI', 'OP_247_247');
 	};  // OP_247_247 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_248_248 = function () {
-		unimplemented ('DVI', 'OP_248_248'); return 0;
+		unimplemented ('DVI', 'OP_248_248');
 	};  // OP_248_248 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_249_249 = function () {
-		unimplemented ('DVI', 'OP_249_249'); return 0;
+		unimplemented ('DVI', 'OP_249_249');
 	};  // OP_249_249 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_BANK_0 = function () {
 		OPCODE_BANK = 0;
-		unimplemented ('DVI', 'OP_255 bank 0'); return 0;
+		unimplemented ('DVI', 'OP_BANK_0 (DC2)');
 	};
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_BANK_1 = function () {
 		OPCODE_BANK = 1;
-		unimplemented ('DVI', 'OP_255 bank 1'); return 0;
-	};
-
-	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
-	var OP_Unicode = function () {
-		unimplemented ('DVI', 'OP_255 bank 1'); return 0;
+		unimplemented ('DVI', 'OP_BANK_1 (DC1)');
 	};
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_Illegal = function () {
-		unimplemented ('DVI', 'OP illegal'); return 0;
+		unimplemented ('DVI', 'OP illegal');
 	};
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
-	var OP_80 = function () {
-		unimplemented ('DVI', 'OP 80'); return 0;
-	}
-
-	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_C0 = function () {
-		unimplemented ('DVI', 'OP C0'); return 0;
+		var a = render.target[render.index++];
+		var b = render.target[render.index++];
+		var c = ((a & 0x1f) << 6) + (b & 0x3f);
+		RENDER (c);
 	}
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_E0 = function () {
-		unimplemented ('DVI', 'OP E0'); return 0;
+		var a = render.target[render.index++];
+		var b = render.target[render.index++];
+		var c = render.target[render.index++];
+		var d = ((a & 0xf) << 12) + ((b & 0x3f) << 6) + (c& 0x3f);
+		RENDER (d);
+	}
+
+	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
+	var OP_F0 = function () {
+		var a = render.target[render.index++];
+		var b = render.target[render.index++];
+		var c = render.target[render.index++];
+		var d = render.target[render.index++];
+		var e = ((a & 0xf) << 18) + ((b & 0x3f) << 12) + ((c& 0x3f) << 6) + (d & 0x3f);
+		RENDER (e);
 	}
 
 	// -------------------------------------------------------------------------
 	// OPCODE and its fill specification (DC1 and DC2 are bank-switcher OPS).
+	/*
+
+愚公移山
+
+	*/
 	var OPCODE_BANK = 0;
 	var OPCODE = [];
-	var OPCODE_FILL_SPECIFICATION = [  // BANK 0 is original, BANK 1 is Unicode
+	var OPCODE_FILL_SPECIFICATION = [  // BANK 0 original DVI
 		[
-			[  0,  17, OP_000_127], [ 17,  17, OP_BANK_1 ], [ 18,  18, OP_BANK_0 ],
+			[  0,  16, OP_000_127], [ 17,  17, OP_BANK_1 ], [ 18,  18, OP_BANK_0 ],
 			[ 19, 127, OP_000_127], [128, 131, OP_128_131], [132, 132, OP_132_132],
 			[133, 136, OP_133_136], [137, 137, OP_137_137], [138, 138, OP_138_138],
 			[139, 139, OP_139_139], [140, 140, OP_140_140], [141, 141, OP_141_141],
@@ -530,11 +566,11 @@ window.onload = (function (win, doc) {
 			[152, 156, OP_152_156], [157, 160, OP_157_160], [161, 165, OP_161_165],
 			[166, 170, OP_166_170], [171, 234, OP_171_234], [235, 238, OP_235_238],
 			[239, 242, OP_239_242], [243, 246, OP_243_246], [247, 247, OP_247_247],
-			[248, 248, OP_248_248], [249, 249, OP_249_249],
-		], [
-			[  0,  17, OP_000_127], [ 17,  17, OP_BANK_1 ], [ 18,  18, OP_BANK_0 ],
-			[ 19, 127, OP_000_127], [0x80, 0xBF, OP_80], [0xC0, 0xDF, OP_C0],
-			[0xE0, 0xEF, OP_E0]
+			[248, 248, OP_248_248], [249, 249, OP_249_249], [250, 255, OP_Illegal],
+		], [  // BANK 1 Unicode
+			[  0,  16, OP_000_127], [ 17,  17, OP_BANK_1 ], [ 18,  18, OP_BANK_0 ],
+			[ 19, 127, OP_000_127], [0x80, 0xBF, OP_Illegal],
+			[0xC0, 0xDF, OP_C0], [0xE0, 0xEF, OP_E0], [0xF0, 0xFF, OP_F0],
 		]
 	];
 
@@ -560,7 +596,9 @@ window.onload = (function (win, doc) {
 		for (render.index = 0; render.index < I && render.ok; ) {
 			var o = buffer.charCodeAt(render.index);
 			//console.log ('I: "' + buffer[i] + '"', o, OPCODE);
-			OPCODE[OPCODE_BANK][o] ();
+			var f = OPCODE[OPCODE_BANK][o];
+			console.log (OPCODE_BANK, o, f);
+			f ();
 		}
 		return render.ok;
 	};  // DVI (buffer)
