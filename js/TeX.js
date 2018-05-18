@@ -1,6 +1,7 @@
 'use strict'
 
 // TODO: Guarantee font-face loaded and cross-browser.
+// TODO: Two banks of DVI OPCODES 1. original 2. Unicode
 
 /* DVI engine
 https://web.archive.org/web/20070403030353/\
@@ -233,7 +234,7 @@ window.onload = (function (win, doc) {
 	var margin   = { top: 50, bottom: 10, left: 10, right: 10 };
 	var border   = { top:  0, bottom:  0, left:  0, right:  0 };
 	var padding  = { top:  0, bottom:  3, left:  0, right:  0 };
-	var font     = { size: 12, face: 'serif' };
+	var font     = { size: 12, face: 'Cabin' };
 	var page     = { number: 0, numbers: false, canvas: null, ctx: null, align: 'C' };
 	var line     = { height: font.size + padding.top + padding.bottom, text: '' };
 	var render   = { h: 0, v: 0, source: '', target: '', index: 0, ok: true };
@@ -274,7 +275,7 @@ window.onload = (function (win, doc) {
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var reload = function () {
 		var section          = doc.createElement ('h3');
-		section.innerHTML    = 'TeX (Rendered) (fake)';
+		section.innerHTML    = 'TeX (Rendered)';
 		section.setAttribute  ('class', 'no-print');
 		doc.body.appendChild (doc.createElement ('hr'));
 		doc.body.appendChild (section);
@@ -478,27 +479,76 @@ window.onload = (function (win, doc) {
 		unimplemented ('DVI', 'OP_249_249'); return 0;
 	};  // OP_249_249 
 
+	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
+	var OP_BANK_0 = function () {
+		OPCODE_BANK = 0;
+		unimplemented ('DVI', 'OP_255 bank 0'); return 0;
+	};
+
+	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
+	var OP_BANK_1 = function () {
+		OPCODE_BANK = 1;
+		unimplemented ('DVI', 'OP_255 bank 1'); return 0;
+	};
+
+	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
+	var OP_Unicode = function () {
+		unimplemented ('DVI', 'OP_255 bank 1'); return 0;
+	};
+
+	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
+	var OP_Illegal = function () {
+		unimplemented ('DVI', 'OP illegal'); return 0;
+	};
+
+	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
+	var OP_80 = function () {
+		unimplemented ('DVI', 'OP 80'); return 0;
+	}
+
+	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
+	var OP_C0 = function () {
+		unimplemented ('DVI', 'OP C0'); return 0;
+	}
+
+	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
+	var OP_E0 = function () {
+		unimplemented ('DVI', 'OP E0'); return 0;
+	}
+
 	// -------------------------------------------------------------------------
-	// OPCODE and its fill specification
+	// OPCODE and its fill specification (DC1 and DC2 are bank-switcher OPS).
+	var OPCODE_BANK = 0;
 	var OPCODE = [];
-	var DVI_INIT = [
-		[  0, 127, OP_000_127], [128, 131, OP_128_131], [132, 132, OP_132_132],
-		[133, 136, OP_133_136], [137, 137, OP_137_137], [138, 138, OP_138_138],
-		[139, 139, OP_139_139], [140, 140, OP_140_140], [141, 141, OP_141_141],
-		[142, 142, OP_142_142], [143, 146, OP_143_146], [147, 151, OP_147_151],
-		[152, 156, OP_152_156], [157, 160, OP_157_160], [161, 165, OP_161_165],
-		[166, 170, OP_166_170], [171, 234, OP_171_234], [235, 238, OP_235_238],
-		[239, 242, OP_239_242], [243, 246, OP_243_246], [247, 247, OP_247_247],
-		[248, 248, OP_248_248], [249, 249, OP_249_249],
+	var OPCODE_FILL_SPECIFICATION = [  // BANK 0 is original, BANK 1 is Unicode
+		[
+			[  0,  17, OP_000_127], [ 17,  17, OP_BANK_1 ], [ 18,  18, OP_BANK_0 ],
+			[ 19, 127, OP_000_127], [128, 131, OP_128_131], [132, 132, OP_132_132],
+			[133, 136, OP_133_136], [137, 137, OP_137_137], [138, 138, OP_138_138],
+			[139, 139, OP_139_139], [140, 140, OP_140_140], [141, 141, OP_141_141],
+			[142, 142, OP_142_142], [143, 146, OP_143_146], [147, 151, OP_147_151],
+			[152, 156, OP_152_156], [157, 160, OP_157_160], [161, 165, OP_161_165],
+			[166, 170, OP_166_170], [171, 234, OP_171_234], [235, 238, OP_235_238],
+			[239, 242, OP_239_242], [243, 246, OP_243_246], [247, 247, OP_247_247],
+			[248, 248, OP_248_248], [249, 249, OP_249_249],
+		], [
+			[  0,  17, OP_000_127], [ 17,  17, OP_BANK_1 ], [ 18,  18, OP_BANK_0 ],
+			[ 19, 127, OP_000_127], [0x80, 0xBF, OP_80], [0xC0, 0xDF, OP_C0],
+			[0xE0, 0xEF, OP_E0]
+		]
 	];
 
 	// -------------------------------------------------------------------------
-	// OPCODE fill loop
-	for (var J = DVI_INIT.length, j = 0; j < J; ++j) {
-		var abc = DVI_INIT[j];
-		var a = abc[0], b = 1 + abc[1], c = abc[2];
-		for (var i=a; i < b; i++) {
-			OPCODE.push (c);
+	// OPCODE fill loop for original DVI
+	for (var bank = 0; bank < OPCODE_FILL_SPECIFICATION.length; ++bank) {
+		OPCODE.push ([]);
+		var spec = OPCODE_FILL_SPECIFICATION[bank];
+		for (var J = spec.length, j = 0; j < J; ++j) {
+			var abc = spec[j];
+			var a = abc[0], b = 1 + abc[1], c = abc[2];
+			for (var i=a; i < b; i++) {
+				OPCODE[bank].push (c);
+			}
 		}
 	}
 
@@ -510,7 +560,7 @@ window.onload = (function (win, doc) {
 		for (render.index = 0; render.index < I && render.ok; ) {
 			var o = buffer.charCodeAt(render.index);
 			//console.log ('I: "' + buffer[i] + '"', o, OPCODE);
-			OPCODE[o] ();
+			OPCODE[OPCODE_BANK][o] ();
 		}
 		return render.ok;
 	};  // DVI (buffer)
