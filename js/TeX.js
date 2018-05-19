@@ -304,6 +304,9 @@ window.onload = (function (win, doc) {
 					} else if (token.substring (i, i+3) == 'par') {
 						data.target += '\n\n   ';
 						i += 3;
+					} else if (token.substring (i, i+7) == 'newpage') {
+						data.target += '\x0c';
+						i += 7;
 					} else {
 						data.target += '\\';  // ignore all other TeX for now
 						data.target += c;
@@ -424,6 +427,10 @@ window.onload = (function (win, doc) {
 		var H = engine.h + h;
 		var i = 0;
 		var I = s.length;
+		if (s[i] == '\x0c') {
+			i++;
+			newPage ();
+		}
 		while (i < I && s[i] == '\n') {
 			renderNL ();
 			H = 0;
