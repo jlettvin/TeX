@@ -1,7 +1,9 @@
 'use strict'
 
 // TODO: Guarantee font-face loaded and cross-browser.
-// TODO: Two banks of DVI OPCODES 1. original 2. Unicode
+// DONE: Two banks of DVI OPCODES 1. original 2. Unicode.
+// TODO: Render Cajal's name properly.
+// TODO: find word-breaks to terminate lines.
 
 /* DVI engine
 https://web.archive.org/web/20070403030353/\
@@ -238,7 +240,7 @@ window.onload = (function (win, doc) {
 	var page     = { number: 0, numbers: false, canvas: null, ctx: null, align: 'C' };
 	var line     = { height: font.size + padding.top + padding.bottom, text: '' };
 	var data     = { source: '', target: '', index: 0, ok: true };
-	var render   = { h: 0, v: 0, w: 0, x: 0, y: 0, z: 0, hh: 0, vv: 0 }; // dvistd0.pdf
+	var engine   = { h: 0, v: 0, w: 0, x: 0, y: 0, z: 0, hh: 0, vv: 0 }; // dvistd0.pdf
 	var stack    = [];
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
@@ -281,30 +283,44 @@ window.onload = (function (win, doc) {
 	// Interpret and render the TeX source.
 	var TeX = function () {
 		newPage ();
+
 		var bottom    = margin.bottom - border.bottom - padding .bottom;
 		var maxY      = paper.height - bottom;
 
 		// Operate on data.source
 		// TODO trivial and incomplete ('TeX', 'interpreter');
-		var escapeChar = false;
-		for (var c of data.source) {
-			if (c == '\\' && !escapeChar) {
-				escapeChar = true;  // Identify beginning of TeX operation
-			} else if (escapeChar) {
-				if (c == '\\') {
-					data.target += '\n';  // double backslash is newline
+		//var tokens = data.source.split (/\b\s+/);
+		var tokens = data.source.match(/\S+/g);
+		for (var token of tokens) {
+			//var token = data.source;
+			var escapeChar = false;
+			for (var I = token.length, i = 0; i < I; ++i) {
+				var c = token[i];
+				if (c == '\\' && !escapeChar) {
+					escapeChar = true;  // Identify beginning of TeX operation
+				} else if (c == '\n') {
+					data.target += ' ';
+				} else if (escapeChar) {
+					//console.log ('"'+token.substring (i, i+3)+'"');
+					if (c == '\\') {
+						data.target += '\n';  // double backslash is newline
+					} else if (token.substring (i, i+3) == 'par') {
+						data.target += '\n\n   ';
+						i += 3;
+					} else {
+						data.target += '\\';  // ignore all other TeX for now
+						data.target += c;
+					}
+					escapeChar = false;
 				} else {
-					data.target += '\\';  // ignore all other TeX for now
-					data.target += c;
-				}
-				escapeChar = false;
-			} else {
-				if (c == '\n') {
-					data.target += ' ';  // newline becomes space
-				} else {
-					data.target += c;  // all other chars are passed
+					if (c == '\n') {
+						data.target += ' ';  // newline becomes space
+					} else {
+						data.target += c;  // all other chars are passed
+					}
 				}
 			}
+			data.target += ' ';
 		}
 	};  // TeX (content)
 
@@ -346,12 +362,12 @@ window.onload = (function (win, doc) {
 		page.canvas        = doc.createElement      ('canvas');
 		page.ctx           = page.canvas.getContext ('2d');
 
-		render.h      = margin.left + border.left + padding.left;
-		render.v      = margin.top  + border.top  + padding.top;
+		engine.h      = margin.left + border.left + padding.left;
+		engine.v      = margin.top  + border.top  + padding.top;
 		page.ctx.font = ''          + font.size   + 'px '       + font.face;
 		page.number   = page.number + 1;
 
-		console.log ('newPage', render.h, render.v);
+		// console.log ('newPage', engine.h, engine.v);
 
 		// Letter-size paper
 		page.canvas.width        = paper. width;
@@ -371,10 +387,10 @@ window.onload = (function (win, doc) {
 
 			if      (page.align == 'C') { X = pWidth / 2; }
 			else if (page.align == 'R') { X = pWidth;     }
-			else                        { X =  render.h;  }
+			else                        { X =  engine.h;  }
 
-			page.ctx.fillText (pageNumber, X, render.v + padding.top);
-			render.v          = render.v + 2 * line.height;
+			page.ctx.fillText (pageNumber, X, engine.v + padding.top);
+			engine.v          = engine.v + 2 * line.height;
 		}
 
 		return page.canvas;
@@ -382,30 +398,37 @@ window.onload = (function (win, doc) {
 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
-	var RENDER = function (c, move=true) {
+	var renderable = function (s) {
+		var finalWidth = engine.h + page.ctx.measureText (s).width;
+		return (finalWidth < paper.width || s[0] == '\n');
+	};  // renderable (s)
+
+	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
+	var render = function (s, move=true) {
 		var bottom    = margin.bottom - border.bottom - padding .bottom;
 		var maxY      = paper.height - bottom;
-		var metrics = page.ctx.measureText (c);
+		var metrics = page.ctx.measureText (s);
 		var h = metrics.width;
-		var H = render.h + h;
-		var newline = (c == '\n');  // This test parm is to be removed.
+		var H = engine.h + h;
+		var newline = (s[0] == '\n');  // This test parm is to be removed.
 		if (H >= paper.width || newline) {
-			render.h = margin.left + border.left + padding.left;
-			render.v += font.size + padding.bottom + padding.top;
-			if (render.v >= maxY) {
+			// console.log (s, H, paper.width);
+			engine.h = margin.left + border.left + padding.left;
+			engine.v += font.size + padding.bottom + padding.top;
+			if (engine.v >= maxY) {
 				newPage ();
 			}
 		}
-		page.ctx.fillText (c, render.h, render.v + padding.top);
+		page.ctx.fillText (s, engine.h, engine.v + padding.top);
 		if (move) {
-			render.h += h
+			engine.h += h
 		}
-	}
+	};  // render
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_000_127 = function () {
 		var c = data.target[data.index++];
-		RENDER (c);
+		render (c);
 	};  // OP_000_127 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
@@ -413,7 +436,7 @@ window.onload = (function (win, doc) {
 		// TODO break this down into 128, 129, 130, and 131 as per spec
 		data.index++;
 		var c = data.target[data.index++];
-		RENDER (c);
+		render (c);
 	};  // OP_128_131 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
@@ -425,7 +448,7 @@ window.onload = (function (win, doc) {
 	var OP_133_136 = function () {
 		data.index++;
 		var c = data.target[data.index++];
-		RENDER (c, false);
+		render (c, false);
 	};  // OP_133_136 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
@@ -544,7 +567,7 @@ window.onload = (function (win, doc) {
 		var a = data.target[data.index++];
 		var b = data.target[data.index++];
 		var c = ((a & 0x1f) << 6) + (b & 0x3f);
-		RENDER (c);
+		render (c);
 	}
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
@@ -553,7 +576,7 @@ window.onload = (function (win, doc) {
 		var b = data.target[data.index++];
 		var c = data.target[data.index++];
 		var d = ((a & 0xf) << 12) + ((b & 0x3f) << 6) + (c& 0x3f);
-		RENDER (d);
+		render (d);
 	}
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
@@ -563,7 +586,7 @@ window.onload = (function (win, doc) {
 		var c = data.target[data.index++];
 		var d = data.target[data.index++];
 		var e = ((a & 0xf) << 18) + ((b & 0x3f) << 12) + ((c& 0x3f) << 6) + (d & 0x3f);
-		RENDER (e);
+		render (e);
 	}
 
 	// -------------------------------------------------------------------------
@@ -608,27 +631,12 @@ window.onload = (function (win, doc) {
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	// Rendering engine for DVI language
-	/*
-
-愚公移山
-
-	*/
 	var DVI = function () {
-		var buffer = data.target;
-		var I = buffer.length;
-		for (data.index = 0; data.index < I && data.ok; ) {
-			var o = buffer.charCodeAt(data.index);
-			//console.log ('I: "' + buffer[i] + '"', o, DVI_OP.code);
-			if (o < 256) {
-				var f = DVI_OP.code[DVI_OP.bank][o];
-				console.log ('A', DVI_OP.bank, o);
-				f ();
-				// console.log ('<', DVI_OP.bank, o);
-			} else {
-				var c = buffer[data.index++];
-				console.log ('U', DVI_OP.bank, c);
-				RENDER (c);
-			}
+		var tokens = data.target.split(' ');
+		for (var token of tokens) {
+			// console.log ('render', '"' + token + '"');
+
+			render (token+' ');
 		}
 		return data.ok;
 	};  // DVI (buffer)
