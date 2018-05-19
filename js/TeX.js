@@ -382,7 +382,7 @@ window.onload = (function (win, doc) {
 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
-	var RENDER = function (c) {
+	var RENDER = function (c, move=true) {
 		var bottom    = margin.bottom - border.bottom - padding .bottom;
 		var maxY      = paper.height - bottom;
 		var metrics = page.ctx.measureText (c);
@@ -397,7 +397,9 @@ window.onload = (function (win, doc) {
 			}
 		}
 		page.ctx.fillText (c, render.h, render.v + padding.top);
-		render.h += h
+		if (move) {
+			render.h += h
+		}
 	}
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
@@ -408,12 +410,10 @@ window.onload = (function (win, doc) {
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_128_131 = function () {
-		unimplemented ('DVI', 'OP_128_131');
-	};  // OP_000_127 
-
-	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
-	var OP_128_131 = function () {
-		unimplemented ('DVI', 'OP_128_131');
+		// TODO break this down into 128, 129, 130, and 131 as per spec
+		data.index++;
+		var c = data.target[data.index++];
+		RENDER (c);
 	};  // OP_128_131 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
@@ -423,7 +423,9 @@ window.onload = (function (win, doc) {
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_133_136 = function () {
-		unimplemented ('DVI', 'OP_133_136');
+		data.index++;
+		var c = data.target[data.index++];
+		RENDER (c, false);
 	};  // OP_133_136 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
@@ -432,8 +434,7 @@ window.onload = (function (win, doc) {
 	};  // OP_137_137 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
-	var OP_138_138 = function () {
-		unimplemented ('DVI', 'OP_138_138');
+	var OP_138_138 = function () {  // NOP
 	};  // OP_138_138 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
