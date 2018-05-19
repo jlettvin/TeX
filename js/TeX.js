@@ -237,13 +237,30 @@ window.onload = (function (win, doc) {
 	var font     = { size: 12, face: 'Cabin' };
 	var page     = { number: 0, numbers: false, canvas: null, ctx: null, align: 'C' };
 	var line     = { height: font.size + padding.top + padding.bottom, text: '' };
-	var render   = { h: 0, v: 0, source: '', target: '', index: 0, ok: true };
+	var data     = { source: '', target: '', index: 0, ok: true };
+	var render   = { h: 0, v: 0, w: 0, x: 0, y: 0, z: 0, hh: 0, vv: 0 }; // dvistd0.pdf
+	var stack    = [];
+
+	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
+	var push = function () {
+		stack.push ({
+			size: font.size,
+			face: font.face
+		});
+	};  // push
+
+	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
+	var pop  = function () {
+		var item = stack.pop ();
+		font.size = item.font.size;
+		font.face = item.font.face;
+	};  // pop
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var unimplemented = function (subsystem, name) {
 		console.log ('UNIMPLEMENTED: ' + subsystem + ': ' + name);
-		render.ok = false;
-	}
+		data.ok = false;
+	};  // unimplemented
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	// Enable multi-line strings in older versions of ECMAscript (javascript)
@@ -253,9 +270,9 @@ window.onload = (function (win, doc) {
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	doc.main = doc.main || function (source) {
-		render.source = source;
+		data.source = source;
 		for (var f of [reload, TeX, DVI, raw]) {
-			if (!render.ok) break; else
+			if (!data.ok) break; else
 			f ();
 		}
 	};  // doc.main
@@ -267,9 +284,9 @@ window.onload = (function (win, doc) {
 		var bottom    = margin.bottom - border.bottom - padding .bottom;
 		var maxY      = paper.height - bottom;
 
-		// Operate on render.source
+		// Operate on data.source
 		//unimplemented ('TeX', 'interpreter');
-		render.target = render.source;  // Simply copy TeX into DVI
+		data.target = data.source;  // Simply copy TeX into DVI
 	};  // TeX (content)
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
@@ -290,7 +307,7 @@ window.onload = (function (win, doc) {
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	// Display the source code being rendered.
 	var raw = function () {
-		var content = render.source;
+		var content = data.source;
 		var section = doc.createElement ('h3');
 		section.innerHTML = 'TeX (Raw)';
 		doc.body.appendChild (section);
@@ -366,12 +383,12 @@ window.onload = (function (win, doc) {
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_000_127 = function () {
-		var c = render.target[render.index++];
+		var c = data.target[data.index++];
 		RENDER (c);
 		/*
 		var bottom    = margin.bottom - border.bottom - padding .bottom;
 		var maxY      = paper.height - bottom;
-		var c = render.target[render.index++];
+		var c = data.target[data.index++];
 		var metrics = page.ctx.measureText (c);
 		var h = metrics.width;
 		var H = render.h + h;
@@ -505,14 +522,14 @@ window.onload = (function (win, doc) {
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_BANK_0 = function () {
-		OPCODE_BANK = 0;
-		unimplemented ('DVI', 'OP_BANK_0 (DC2)');
+		DVI_OP.bank = 0;
+		data.index++;
 	};
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_BANK_1 = function () {
-		OPCODE_BANK = 1;
-		unimplemented ('DVI', 'OP_BANK_1 (DC1)');
+		DVI_OP.bank = 1;
+		data.index++;
 	};
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
@@ -522,43 +539,42 @@ window.onload = (function (win, doc) {
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_C0 = function () {
-		var a = render.target[render.index++];
-		var b = render.target[render.index++];
+		var a = data.target[data.index++];
+		var b = data.target[data.index++];
 		var c = ((a & 0x1f) << 6) + (b & 0x3f);
 		RENDER (c);
 	}
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_E0 = function () {
-		var a = render.target[render.index++];
-		var b = render.target[render.index++];
-		var c = render.target[render.index++];
+		var a = data.target[data.index++];
+		var b = data.target[data.index++];
+		var c = data.target[data.index++];
 		var d = ((a & 0xf) << 12) + ((b & 0x3f) << 6) + (c& 0x3f);
 		RENDER (d);
 	}
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_F0 = function () {
-		var a = render.target[render.index++];
-		var b = render.target[render.index++];
-		var c = render.target[render.index++];
-		var d = render.target[render.index++];
+		var a = data.target[data.index++];
+		var b = data.target[data.index++];
+		var c = data.target[data.index++];
+		var d = data.target[data.index++];
 		var e = ((a & 0xf) << 18) + ((b & 0x3f) << 12) + ((c& 0x3f) << 6) + (d & 0x3f);
 		RENDER (e);
 	}
 
 	// -------------------------------------------------------------------------
 	// OPCODE and its fill specification (DC1 and DC2 are bank-switcher OPS).
-	/*
+	/* DC2 (Unicode) is ^R, DC1 (ASCII) is ^Q.
 
 愚公移山
 
 	*/
-	var OPCODE_BANK = 0;
-	var OPCODE = [];
-	var OPCODE_FILL_SPECIFICATION = [  // BANK 0 original DVI
+	var DVI_OP = { bank: 0, code: [] };
+	var DVI_OP_FILL_SPECIFICATION = [  // BANK 0 original DVI
 		[
-			[  0,  16, OP_000_127], [ 17,  17, OP_BANK_1 ], [ 18,  18, OP_BANK_0 ],
+			[  0,  16, OP_000_127], [ 17,  17, OP_BANK_0 ], [ 18,  18, OP_BANK_1 ],
 			[ 19, 127, OP_000_127], [128, 131, OP_128_131], [132, 132, OP_132_132],
 			[133, 136, OP_133_136], [137, 137, OP_137_137], [138, 138, OP_138_138],
 			[139, 139, OP_139_139], [140, 140, OP_140_140], [141, 141, OP_141_141],
@@ -568,7 +584,7 @@ window.onload = (function (win, doc) {
 			[239, 242, OP_239_242], [243, 246, OP_243_246], [247, 247, OP_247_247],
 			[248, 248, OP_248_248], [249, 249, OP_249_249], [250, 255, OP_Illegal],
 		], [  // BANK 1 Unicode
-			[  0,  16, OP_000_127], [ 17,  17, OP_BANK_1 ], [ 18,  18, OP_BANK_0 ],
+			[  0,  16, OP_000_127], [ 17,  17, OP_BANK_0 ], [ 18,  18, OP_BANK_1 ],
 			[ 19, 127, OP_000_127], [0x80, 0xBF, OP_Illegal],
 			[0xC0, 0xDF, OP_C0], [0xE0, 0xEF, OP_E0], [0xF0, 0xFF, OP_F0],
 		]
@@ -576,31 +592,43 @@ window.onload = (function (win, doc) {
 
 	// -------------------------------------------------------------------------
 	// OPCODE fill loop for original DVI
-	for (var bank = 0; bank < OPCODE_FILL_SPECIFICATION.length; ++bank) {
-		OPCODE.push ([]);
-		var spec = OPCODE_FILL_SPECIFICATION[bank];
+	for (var bank = 0; bank < DVI_OP_FILL_SPECIFICATION.length; ++bank) {
+		DVI_OP.code.push ([]);
+		var spec = DVI_OP_FILL_SPECIFICATION[bank];
 		for (var J = spec.length, j = 0; j < J; ++j) {
 			var abc = spec[j];
 			var a = abc[0], b = 1 + abc[1], c = abc[2];
 			for (var i=a; i < b; i++) {
-				OPCODE[bank].push (c);
+				DVI_OP.code[bank].push (c);
 			}
 		}
 	}
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	// Rendering engine for DVI language
+	/*
+
+愚公移山
+
+	*/
 	var DVI = function () {
-		var buffer = render.target;
+		var buffer = data.target;
 		var I = buffer.length;
-		for (render.index = 0; render.index < I && render.ok; ) {
-			var o = buffer.charCodeAt(render.index);
-			//console.log ('I: "' + buffer[i] + '"', o, OPCODE);
-			var f = OPCODE[OPCODE_BANK][o];
-			console.log (OPCODE_BANK, o, f);
-			f ();
+		for (data.index = 0; data.index < I && data.ok; ) {
+			var o = buffer.charCodeAt(data.index);
+			//console.log ('I: "' + buffer[i] + '"', o, DVI_OP.code);
+			if (o < 256) {
+				var f = DVI_OP.code[DVI_OP.bank][o];
+				console.log ('A', DVI_OP.bank, o);
+				f ();
+				// console.log ('<', DVI_OP.bank, o);
+			} else {
+				var c = buffer[data.index++];
+				console.log ('U', DVI_OP.bank, c);
+				RENDER (c);
+			}
 		}
-		return render.ok;
+		return data.ok;
 	};  // DVI (buffer)
 
 })(window, document);
