@@ -3,7 +3,8 @@
 // TODO: Guarantee font-face loaded and cross-browser.
 // DONE: Two banks of DVI OPCODES 1. original 2. Unicode.
 // TODO: Render Cajal's name properly.
-// TODO: find word-breaks to terminate lines.
+// DONE: find word-breaks to terminate lines.
+// TODO: fix occasional extra space before \par
 
 /* DVI engine
 https://web.archive.org/web/20070403030353/\
@@ -240,7 +241,7 @@ window.onload = (function (win, doc) {
 	var page     = { number: 0, numbers: false, canvas: null, ctx: null, align: 'C' };
 	var line     = { height: font.size + padding.top + padding.bottom, text: '' };
 	var data     = { source: '', target: '', index: 0, ok: true };
-	var engine   = { h: 0, v: 0, w: 0, x: 0, y: 0, z: 0, hh: 0, vv: 0 }; // dvistd0.pdf
+	var engine   = { n: 0, h: 0, v: 0, w: 0, x: 0, y: 0, z: 0, hh: 0, vv: 0 }; // dvistd0.pdf
 	var stack    = [];
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
@@ -408,16 +409,23 @@ window.onload = (function (win, doc) {
 		var bottom    = margin.bottom - border.bottom - padding .bottom;
 		var maxY      = paper.height - bottom;
 		var metrics = page.ctx.measureText (s);
+		var space   = page.ctx.measureText (' ');
 		var h = metrics.width;
 		var H = engine.h + h;
 		var newline = (s[0] == '\n');  // This test parm is to be removed.
-		if (H >= paper.width || newline) {
+		if (engine.n++ == 0) {
+			// First word on the line
+		} else if (H >= paper.width || newline) {
 			// console.log (s, H, paper.width);
 			engine.h = margin.left + border.left + padding.left;
 			engine.v += font.size + padding.bottom + padding.top;
 			if (engine.v >= maxY) {
 				newPage ();
 			}
+			engine.n = 0;
+			h += space.width;
+		} else {
+			h += space.width;
 		}
 		page.ctx.fillText (s, engine.h, engine.v + padding.top);
 		if (move) {
@@ -636,7 +644,7 @@ window.onload = (function (win, doc) {
 		for (var token of tokens) {
 			// console.log ('render', '"' + token + '"');
 
-			render (token+' ');
+			render (token);
 		}
 		return data.ok;
 	};  // DVI (buffer)
