@@ -285,8 +285,27 @@ window.onload = (function (win, doc) {
 		var maxY      = paper.height - bottom;
 
 		// Operate on data.source
-		//unimplemented ('TeX', 'interpreter');
-		data.target = data.source;  // Simply copy TeX into DVI
+		// TODO trivial and incomplete ('TeX', 'interpreter');
+		var escapeChar = false;
+		for (var c of data.source) {
+			if (c == '\\' && !escapeChar) {
+				escapeChar = true;  // Identify beginning of TeX operation
+			} else if (escapeChar) {
+				if (c == '\\') {
+					data.target += '\n';  // double backslash is newline
+				} else {
+					data.target += '\\';  // ignore all other TeX for now
+					data.target += c;
+				}
+				escapeChar = false;
+			} else {
+				if (c == '\n') {
+					data.target += ' ';  // newline becomes space
+				} else {
+					data.target += c;  // all other chars are passed
+				}
+			}
+		}
 	};  // TeX (content)
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
@@ -385,24 +404,6 @@ window.onload = (function (win, doc) {
 	var OP_000_127 = function () {
 		var c = data.target[data.index++];
 		RENDER (c);
-		/*
-		var bottom    = margin.bottom - border.bottom - padding .bottom;
-		var maxY      = paper.height - bottom;
-		var c = data.target[data.index++];
-		var metrics = page.ctx.measureText (c);
-		var h = metrics.width;
-		var H = render.h + h;
-		var newline = (c == '\n');  // This test parm is to be removed.
-		if (H >= paper.width || newline) {
-			render.h = margin.left + border.left + padding.left;
-			render.v += font.size + padding.bottom + padding.top;
-			if (render.v >= maxY) {
-				newPage ();
-			}
-		}
-		page.ctx.fillText (c, render.h, render.v + padding.top);
-		render.h += h
-		*/
 	};  // OP_000_127 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
