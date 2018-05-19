@@ -3,16 +3,12 @@
   <head>
     <meta   charset="utf-8" />
     <link   type="image/x-icon" href="img/BBKtm.png" rel="icon" />
-	<link rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Cabin">
     <script type="text/javascript"  src="js/TeX.js"></script>
     <style>
 body { font-family: 'Cabin', serif; font-size: 16px; }
 table { border: 1px solid black; }
 @media print {
-	.no-print, -no-print * {
-		display: none !important;
-	}
+	.no-print, -no-print * { display: none !important; }
 	table {
 		page-break-after: always;
 		border-collapse: collapse;
@@ -21,30 +17,31 @@ table { border: 1px solid black; }
 		padding: 0;
 		margin: 0;
 }
-/* @import url(https://fonts.googleapis.com/css?family=Baskerville); */
-/*
-@font-face {
-    font-family: 'TeXfont';
-    src: url('myfont-webfont.eot?#iefix') format('embedded-opentype'), 
-        url('myfont-webfont.woff') format('woff'), 
-        url('myfont-webfont.ttf')  format('truetype'),
-        url('myfont-webfont.svg#svgFontName') format('svg');
-}
-*/
 	</style>
   </head>
-  <body>
-	  <!-- <h1>TeX.js Version 23</h1> -->
-  </body>
+  <body></body>
   <script type="text/javascript">
 	document.main (document.HEREDOC(function() {/*
+\par
+TITLE: IMPLEMENTING TeX in JAVASCRIPT
+\par
+SUBTITLE: Rapid authoring support without using tools or servers.
 \par
 EXAMPLES OF IMPLEMENTED TeX
 \par
 This is exceedingly good fun.
 \\
                                   And this is on the next line.
+\par
+TeX.js interprets an embedded javascript string as TeX source,
+converts escaped keywords to DVI,
+then interprets the DVI by rendering it to HTML5 canvases.
+New canvases are created on-the-fly to accomodate as needed.
+Printing the displayed web page results in
+printing only the canvases with page breaks between canvases.
 \newpage
+\par
+This is how to render UTF8 Unicode (^R to start, ^Q to finish).
 \\
 AB愚公移山CD
 */}));
