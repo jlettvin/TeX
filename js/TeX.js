@@ -241,22 +241,18 @@ window.onload = (function (win, doc) {
 	var page     = { number: 0, numbers: false, canvas: null, ctx: null, align: 'C' };
 	var line     = { height: font.size + padding.top + padding.bottom, text: '' };
 	var data     = { source: '', target: '', index: 0, ok: true };
-	var engine   = { n: 0, h: 0, v: 0, w: 0, x: 0, y: 0, z: 0, hh: 0, vv: 0 }; // dvistd0.pdf
+	var word     = { n: 0 };
+	var engine   = { h: 0, v: 0, w: 0, x: 0, y: 0, z: 0 }; // dvistd0.pdf
 	var stack    = [];
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var push = function () {
-		stack.push ({
-			size: font.size,
-			face: font.face
-		});
+		stack.push (engine.assign ());
 	};  // push
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var pop  = function () {
-		var item = stack.pop ();
-		font.size = item.font.size;
-		font.face = item.font.face;
+		engine.assign (stack.pop ());
 	};  // pop
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
@@ -413,7 +409,7 @@ window.onload = (function (win, doc) {
 		var h = metrics.width;
 		var H = engine.h + h;
 		var newline = (s[0] == '\n');  // This test parm is to be removed.
-		if (engine.n++ == 0) {
+		if (word.n++ == 0) {
 			// First word on the line
 		} else if (H >= paper.width || newline) {
 			// console.log (s, H, paper.width);
@@ -422,7 +418,7 @@ window.onload = (function (win, doc) {
 			if (engine.v >= maxY) {
 				newPage ();
 			}
-			engine.n = 0;
+			word.n = 0;
 			h += space.width;
 		} else {
 			h += space.width;
@@ -480,12 +476,12 @@ window.onload = (function (win, doc) {
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_141_141 = function () {
-		unimplemented ('DVI', 'OP_141_141');
+		push ();
 	};  // OP_141_141 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var OP_142_142 = function () {
-		unimplemented ('DVI', 'OP_142_142');
+		pop ();
 	};  // OP_142_142 
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
