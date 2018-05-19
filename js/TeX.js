@@ -276,6 +276,13 @@ window.onload = (function (win, doc) {
 		}
 	};  // doc.main
 
+	// KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK
+	var keyword = {
+		'\\':    function () { data.target += '\n';      },
+		par:     function () { data.target += '\n\n   '; },
+		newpage: function () { data.target += '\x0c';    }
+	};
+
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	// Interpret and render the TeX source.
 	var TeX = function () {
@@ -299,17 +306,13 @@ window.onload = (function (win, doc) {
 					data.target += ' ';
 				} else if (escapeChar) {
 					//console.log ('"'+token.substring (i, i+3)+'"');
-					if (c == '\\') {
-						data.target += '\n';  // double backslash is newline
-					} else if (token.substring (i, i+3) == 'par') {
-						data.target += '\n\n   ';
-						i += 3;
-					} else if (token.substring (i, i+7) == 'newpage') {
-						data.target += '\x0c';
-						i += 7;
+					var found = token.substring (i);
+					if (found in keyword) {
+						keyword[found] ();
+						i += found.length;
 					} else {
 						data.target += '\\';  // ignore all other TeX for now
-						data.target += c;
+						data.target += found;
 					}
 					escapeChar = false;
 				} else {
