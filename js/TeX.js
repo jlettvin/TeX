@@ -341,7 +341,7 @@ window.onload = (function (win, doc) {
 		//reload.setAttribute  ('class', 'no-print');
 
 		var print            = doc.createElement ('button');
-		print.innerHTML          = 'print';
+		print.innerHTML      = 'print';
 		print.setAttribute   ('class', 'no-print');
 		print.setAttribute   ('onClick', 'window.print()');
 
@@ -368,12 +368,12 @@ window.onload = (function (win, doc) {
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	// Create a new canvas and return it to be filled.
 	var newPage = function () {
-		var td             = doc.createElement      ('td'    );
-		var tr             = doc.createElement      ('tr'    );
-		var table          = doc.createElement      ('table' );
+		var td        = doc.createElement      ('td'    );
+		var tr        = doc.createElement      ('tr'    );
+		var table     = doc.createElement      ('table' );
 
-		page.canvas        = doc.createElement      ('canvas');
-		page.ctx           = page.canvas.getContext ('2d');
+		page.canvas   = doc.createElement      ('canvas');
+		page.ctx      = page.canvas.getContext ('2d');
 
 		engine.h      = margin.left + border.left + padding.left;
 		engine.v      = margin.top  + border.top  + padding.top;
