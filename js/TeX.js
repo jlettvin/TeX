@@ -277,7 +277,7 @@ window.onload = (function (win, doc) {
 	};  // doc.main
 
 	// KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK
-	var keyword = {
+	var TeXkeyword = {
 		'\\':    function () { data.target += '\n';      },
 		par:     function () { data.target += '\n\n   '; },
 		newpage: function () { data.target += '\x0c';    }
@@ -307,8 +307,8 @@ window.onload = (function (win, doc) {
 				} else if (escapeChar) {
 					//console.log ('"'+token.substring (i, i+3)+'"');
 					var found = token.substring (i);
-					if (found in keyword) {
-						keyword[found] ();
+					if (found in TeXkeyword) {
+						TeXkeyword[found] ();
 						i += found.length;
 					} else {
 						data.target += '\\';  // ignore all other TeX for now
@@ -329,17 +329,24 @@ window.onload = (function (win, doc) {
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var reload = function () {
-		var section          = doc.createElement ('h3');
-		section.innerHTML    = 'TeX (Rendered)';
-		section.setAttribute  ('class', 'no-print');
-		doc.body.appendChild (doc.createElement ('hr'));
-		doc.body.appendChild (section);
+		//var section          = doc.createElement ('h3');
+		//section.innerHTML    = 'TeX (Rendered)';
+		//section.setAttribute  ('class', 'no-print');
+		//doc.body.appendChild (doc.createElement ('hr'));
+		//doc.body.appendChild (section);
 
-		var reload           = doc.createElement ('button');
-		reload.innerHTML     = 'reload';
-		reload.setAttribute  ('onclick', 'location.reload(true)');
-		reload.setAttribute  ('class', 'no-print');
-		doc.body.appendChild (reload);
+		//var reload           = doc.createElement ('button');
+		//reload.innerHTML     = 'reload';
+		//reload.setAttribute  ('onclick', 'location.reload(true)');
+		//reload.setAttribute  ('class', 'no-print');
+
+		var print            = doc.createElement ('button');
+		print.innerHTML          = 'print';
+		print.setAttribute   ('class', 'no-print');
+		print.setAttribute   ('onClick', 'window.print()');
+
+		//doc.body.appendChild (reload);
+		doc.body.appendChild (print);
 	};  // reload ();
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
