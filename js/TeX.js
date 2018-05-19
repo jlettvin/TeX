@@ -339,14 +339,17 @@ window.onload = (function (win, doc) {
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	// Display the source code being rendered.
 	var raw = function () {
-		var content = data.source;
+		var span    = doc.createElement ('span');
+		span.setAttribute ('class', 'no-print');
+
 		var section = doc.createElement ('h3');
 		section.innerHTML = 'TeX (Raw)';
-		doc.body.appendChild (section);
+		span.appendChild (section);
 
 		var target           = doc.createElement ('pre');
-		target.innerHTML     = content;
-		doc.body.appendChild (target);
+		target.innerHTML     = data.source;
+		span.appendChild (target);
+		doc.body.appendChild (span);
 	};  // raw (content)
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
