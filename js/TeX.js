@@ -400,6 +400,17 @@ window.onload = (function (win, doc) {
 		return (finalWidth < paper.width || s[0] == '\n');
 	};  // renderable (s)
 
+	var renderNL = function () {
+		var bottom    = margin.bottom - border.bottom - padding .bottom;
+		var maxY      = paper.height - bottom;
+		engine.h = margin.left + border.left + padding.left;
+		engine.v += font.size + padding.bottom + padding.top;
+		if (engine.v >= maxY) {
+			newPage ();
+		}
+		word.n = 0;
+	};  // renderNL ()
+
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var render = function (s, move=true) {
 		var bottom    = margin.bottom - border.bottom - padding .bottom;
@@ -408,22 +419,23 @@ window.onload = (function (win, doc) {
 		var space   = page.ctx.measureText (' ');
 		var h = metrics.width;
 		var H = engine.h + h;
-		var newline = (s[0] == '\n');  // This test parm is to be removed.
+		var i = 0;
+		var I = s.length;
+		while (i < I && s[i] == '\n') {
+			renderNL ();
+			H = 0;
+			word.n = 0;
+			i++;
+		}
 		if (word.n++ == 0) {
 			// First word on the line
-		} else if (H >= paper.width || newline) {
-			// console.log (s, H, paper.width);
-			engine.h = margin.left + border.left + padding.left;
-			engine.v += font.size + padding.bottom + padding.top;
-			if (engine.v >= maxY) {
-				newPage ();
-			}
-			word.n = 0;
+		} else if (H >= paper.width) {
+			renderNL ();
 			h += space.width;
 		} else {
 			h += space.width;
 		}
-		page.ctx.fillText (s, engine.h, engine.v + padding.top);
+		page.ctx.fillText (s.substr (i), engine.h, engine.v + padding.top);
 		if (move) {
 			engine.h += h
 		}
