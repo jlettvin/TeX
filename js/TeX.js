@@ -270,7 +270,7 @@ window.onload = (function (win, doc) {
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	doc.main = doc.main || function (source) {
 		data.source = source;
-		for (var f of [reload, TeX, DVI, raw]) {
+		for (var f of [buttons, TeX, DVI, raw]) {
 			if (!data.ok) break; else
 			f ();
 		}
@@ -328,7 +328,12 @@ window.onload = (function (win, doc) {
 	};  // TeX (content)
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
-	var reload = function () {
+	var buttons = function () {
+		var print            = doc.createElement ('button');
+		print.innerHTML      = 'print';
+		print.setAttribute   ('class', 'no-print');
+		print.setAttribute   ('onClick', 'window.print()');
+
 		var stop             = doc.createElement ('button');
 		stop.innerHTML       = 'freeze';
 		stop.setAttribute    ('id', 'stopRefresh');
@@ -341,15 +346,9 @@ window.onload = (function (win, doc) {
 			'}) ();'
 		);
 
-		var print            = doc.createElement ('button');
-		print.innerHTML      = 'print';
-		print.setAttribute   ('class', 'no-print');
-		print.setAttribute   ('onClick', 'window.print()');
-
-		//doc.body.appendChild (reload);
-		doc.body.appendChild (stop );
 		doc.body.appendChild (print);
-	};  // reload ();
+		doc.body.appendChild (stop );
+	};  // buttons ();
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	// Display the source code being rendered.
