@@ -430,14 +430,10 @@ window.onload = (function (win, doc) {
 			word.n = 0;
 			i++;
 		}
-		if (word.n++ == 0) {
-			// First word on the line
-		} else if (H >= paper.width) {
+		if (word.n++ != 0 && H >= paper.width) {
 			renderNL ();
-			h += space.width;
-		} else {
-			h += space.width;
 		}
+		h += space.width;
 		page.ctx.fillText (s.substr (i), engine.h, engine.v + padding.top);
 		if (move) {
 			engine.h += h
