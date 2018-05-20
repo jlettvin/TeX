@@ -237,13 +237,21 @@ window.onload = (function (win, doc) {
 	var margin   = { top: 50, bottom: 10, left: 10, right: 10 };
 	var border   = { top:  0, bottom:  0, left:  0, right:  0 };
 	var padding  = { top:  0, bottom:  3, left:  0, right:  0 };
-	var font     = { size: 12, face: 'Cabin' };
+	var font     = [
+		{ size: 14, face: '14px Georgia' },
+		{ size: 14, face: 'Italic 14px Georgia' },
+		{ size: 20, face: '20px Georgia' },
+		{ size: 20, face: 'Italic 20px Georgia'}
+	];
 	var page     = { number: 0, numbers: false, canvas: null, ctx: null, align: 'C' };
-	var line     = { height: font.size + padding.top + padding.bottom, text: '' };
+	var line     = { height: font[0].size + padding.top + padding.bottom, text: '' };
 	var data     = { source: '', target: '', index: 0, ok: true };
 	var word     = { n: 0 };
 	var engine   = { h: 0, v: 0, w: 0, x: 0, y: 0, z: 0 }; // dvistd0.pdf
 	var stack    = [];
+
+	engine.f = font[0].face;
+	//console.log (engine.f);
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var push = function () {
@@ -253,6 +261,7 @@ window.onload = (function (win, doc) {
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var pop  = function () {
 		engine.assign (stack.pop ());
+		page.ctx.font = engine.f;
 	};  // pop
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
@@ -309,11 +318,11 @@ window.onload = (function (win, doc) {
 					var found = token.substring (i);
 					if (found in TeXkeyword) {
 						TeXkeyword[found] ();
-						i += found.length;
 					} else {
 						data.target += '\\';  // ignore all other TeX for now
 						data.target += found;
 					}
+					i += found.length;
 					escapeChar = false;
 				} else {
 					if (c == '\n') {
@@ -378,7 +387,6 @@ window.onload = (function (win, doc) {
 
 		engine.h      = margin.left + border.left + padding.left;
 		engine.v      = margin.top  + border.top  + padding.top;
-		page.ctx.font = ''          + font.size   + 'px '       + font.face;
 		page.number   = page.number + 1;
 
 		// console.log ('newPage', engine.h, engine.v);
@@ -386,6 +394,8 @@ window.onload = (function (win, doc) {
 		// Letter-size paper
 		page.canvas.width        = paper. width;
 		page.canvas.height       = paper.height;
+		page.ctx.font            = engine.f;
+		//console.log('"'+page.ctx.font+'"');
 		page.canvas.setAttribute ("id"   , "page." + page.number);
 		page.canvas.setAttribute ("class", "page"               );
 
@@ -421,7 +431,7 @@ window.onload = (function (win, doc) {
 		var bottom    = margin.bottom - border.bottom - padding .bottom;
 		var maxY      = paper.height - bottom;
 		engine.h = margin.left + border.left + padding.left;
-		engine.v += font.size + padding.bottom + padding.top;
+		engine.v += font[0].size + padding.bottom + padding.top;
 		if (engine.v >= maxY) {
 			newPage ();
 		}
@@ -629,6 +639,8 @@ window.onload = (function (win, doc) {
 愚公移山
 
 	*/
+	const Hc0 = 0xc0, He0 = 0xe0, Hf0 = 0xf0, H80 = 0x80;
+	const Hbf = 0xbf, Hdf = 0xdf, Hef = 0xef, Hff = 0xFF;
 	var DVI_OP = { bank: 0, code: [] };
 	var DVI_OP_FILL_SPECIFICATION = [  // BANK 0 original DVI
 		[
@@ -643,8 +655,8 @@ window.onload = (function (win, doc) {
 			[248, 248, OP_248_248], [249, 249, OP_249_249], [250, 255, OP_Illegal],
 		], [  // BANK 1 Unicode
 			[  0,  16, OP_000_127], [ 17,  17, OP_BANK_0 ], [ 18,  18, OP_BANK_1 ],
-			[ 19, 127, OP_000_127], [0x80, 0xBF, OP_Illegal],
-			[0xC0, 0xDF, OP_C0], [0xE0, 0xEF, OP_E0], [0xF0, 0xFF, OP_F0],
+			[ 19, 127, OP_000_127], [H80, Hbf, OP_Illegal],
+			[Hc0, Hdf, OP_C0     ], [He0, Hef, OP_E0     ], [Hf0, Hff, OP_F0     ],
 		]
 	];
 
