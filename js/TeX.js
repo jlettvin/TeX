@@ -64,11 +64,44 @@ window.onload = (function (win, doc) {
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	doc.main = doc.main || function (source) {
 		data.source = source;
-		for (var f of [buttons, TeX, DVI, raw]) {
+		for (var f of [buttons, newTeX, DVI, raw]) {
 			if (!data.ok) break; else
 			f ();
 		}
 	};  // doc.main
+
+	// KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK
+	var newTeXreplacements = [
+		// Note: ".*?" means reluctant match (opposite of greedy)
+		[/^%.*$/gim                           , ''],
+		[/\\documentclass(\[.*?\])?{(.*?)}/gim, ''],
+		[/\\chapter{(.*?)}/gim                , ''],
+		[/\\begin{(.*?)}/gim                  , ''],
+		[/\\part{(.*?)}/gim                   , ''],
+		[/\\end{(.*?)}/gim                    , ''],
+		[/\s+/gim                             , ' '],
+		[/\\newpage/gim                       , '\x0c'],
+		[/\\it{(.*?)}/gim                     , '$1'],
+		[/\\par/gim                           , '\n\n   '],
+		[/\\title{(.*?)}/gim                  , '\n\n   $1'],
+		[/\\subtitle{(.*?)}/gim               , '\n\n   $1'],
+		[/\\subsubtitle{(.*?)}/gim            , '\n\n   $1'],
+		[/\\section{(.*?)}/gim                , '\n\n   $1'],
+		[/\\subsection{(.*?)}/gim             , '\n\n   $1'],
+		[/\\subsubsection{(.*?)}/gim          , '\n\n   $1'],
+		[/\\references/gim                    , '\n\n   '],
+		[/\\\\/gim                            , '\n'],
+	];
+
+	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
+	var newTeX = function () {
+		newPage ();
+		var source = data.source;
+		for (var replacement of newTeXreplacements) {
+			source = source.replace (replacement[0], replacement[1]);
+		}
+		data.target = source;
+	};
 
 	// KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK
 	var TeXkeyword = {
@@ -126,15 +159,10 @@ window.onload = (function (win, doc) {
 	var buttons = function () {
 		doc.jlettvin.TeX.refresh = true;
 
-		var print            = doc.createElement ('button');
-		print.innerHTML      = 'print';
-		print.setAttribute   ('class', 'no-print');
-		print.setAttribute   ('onClick', 'window.print()');
-
+		var td1 = doc.createElement ('td');
 		var stop             = doc.createElement ('button');
 		stop.innerHTML       = 'stop';
 		stop.setAttribute    ('id', 'stopRefresh');
-		stop.setAttribute    ('class', 'no-print');
 		stop.setAttribute    ('onClick',
 			'(function () {' +
 			' var refresh = !document.jlettvin.TeX.refresh;' +
@@ -145,13 +173,29 @@ window.onload = (function (win, doc) {
 			'   location.reload ();' +
 			' }' +
 			' var e = document.getElementById ("stopRefresh");' +
-			' e.innerHTML = refresh ? "stop" : "start";' +
+			' e.innerHTML = refresh ? "stop" : "poll";' +
 			';' +
 			'}) ();'
 		);
+		td1.appendChild (stop);
 
-		doc.body.appendChild (print);
-		doc.body.appendChild (stop );
+		var td2 = doc.createElement ('td');
+		var print            = doc.createElement ('button');
+		print.innerHTML      = 'print';
+		print.setAttribute   ('onClick', 'window.print()');
+		print.setAttribute   ('class', 'no-print');
+		td1.appendChild (print);
+
+		var tr = doc.createElement ('tr');
+		tr.appendChild (td1);
+		tr.appendChild (td2);
+
+		var table = doc.createElement ('table');
+		table.setAttribute   ('style', 'position: fixed; right: 0; top: 0;');
+		//table.setAttribute   ('align', 'right');
+		table.appendChild (tr);
+
+		doc.body.appendChild (table);
 	};  // buttons ();
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
