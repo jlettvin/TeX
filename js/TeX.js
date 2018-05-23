@@ -19,14 +19,15 @@ window.onload = (function (win, doc) {
 	// Control variables
 	// ------------------------------------------------------------------------
 	var paper    = { width: 785, height: 969 };
-	var margin   = { top: 50, bottom: 10, left: 10, right: 10 };
+	var column   = { count: 1, current: 1 };
+	var margin   = { top: 50, bottom: 10, left: 50, right: 50 };
 	var border   = { top:  0, bottom:  0, left:  0, right:  0 };
 	var padding  = { top:  0, bottom:  3, left:  0, right:  0 };
 	var font     = [
-		{ size: 14, face: '14px Georgia' },
-		{ size: 14, face: 'Italic 14px Georgia' },
-		{ size: 20, face: '20px Georgia' },
-		{ size: 20, face: 'Italic 20px Georgia'}
+		{ size: 14, face: '16px Crete Round' },
+		{ size: 14, face: 'Italic 16px Crete Round' },
+		{ size: 20, face: '20px Crete Round' },
+		{ size: 20, face: 'Italic 20px Crete Round'}
 	];
 	var page     = { number: 0, numbers: false, canvas: null, ctx: null, align: 'C' };
 	var line     = { height: font[0].size + padding.top + padding.bottom, text: '' };
@@ -34,6 +35,8 @@ window.onload = (function (win, doc) {
 	var word     = { n: 0 };
 	var engine   = { h: 0, v: 0, w: 0, x: 0, y: 0, z: 0, f: null }; // dvistd0.pdf
 	var stack    = [];
+
+	column.width = parseInt(paper.width / column.count);
 
 	engine.f = font[0].face;
 	//console.log (engine.f);
@@ -95,7 +98,7 @@ window.onload = (function (win, doc) {
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var newTeX = function () {
-		newPage ();
+		newColumn ();
 		var source = data.source;
 		for (var replacement of newTeXreplacements) {
 			source = source.replace (replacement[0], replacement[1]);
@@ -113,7 +116,7 @@ window.onload = (function (win, doc) {
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	// Interpret and render the TeX source.
 	var TeX = function () {
-		newPage ();
+		newColumn ();
 
 		var bottom    = margin.bottom - border.bottom - padding .bottom;
 		var maxY      = paper.height - bottom;
@@ -215,8 +218,34 @@ window.onload = (function (win, doc) {
 	};  // raw (content)
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
+	var newColumn = function () {
+		var Lwhite = margin.left  + border.left  + padding.left ;
+		var Rwhite = margin.right + border.right + padding.right;
+		var Lcol   = ((column.count + 0) * column.width);
+		var Rcol   = ((column.count + 1) * column.width);
+
+		if (column.count > 1) {
+			column.current = (column.current + 1) % column.count;
+			console.log(column.current);
+			engine.h = Lcol + Lwhite;
+			engine.H = Rcol - Rwhite;
+			if (column.current == 0) {
+				newPage ();
+			}
+		} else {
+			newPage ();
+		}
+	};  // newColumn ()
+
+	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	// Create a new canvas and return it to be filled.
 	var newPage = function () {
+
+		var Lwhite = margin.left  + border.left  + padding.left ;
+		var Rwhite = margin.right + border.right + padding.right;
+		var Lcol   = ((column.count + 0) * column.width);
+		var Rcol   = ((column.count + 1) * column.width);
+
 		var td        = doc.createElement      ('td'    );
 		var tr        = doc.createElement      ('tr'    );
 		var table     = doc.createElement      ('table' );
@@ -224,7 +253,8 @@ window.onload = (function (win, doc) {
 		page.canvas   = doc.createElement      ('canvas');
 		page.ctx      = page.canvas.getContext ('2d');
 
-		engine.h      = margin.left + border.left + padding.left;
+		engine.h      = Lwhite;
+		engine.H      = paper.width - Rwhite;
 		engine.v      = margin.top  + border.top  + padding.top;
 		page.number   = page.number + 1;
 
@@ -263,16 +293,22 @@ window.onload = (function (win, doc) {
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var renderable = function (s) {
 		var finalWidth = engine.h + page.ctx.measureText (s).width;
-		return (finalWidth < paper.width || s[0] == '\n');
+		return (finalWidth < engine.H || s[0] == '\n');
 	};  // renderable (s)
 
+	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
 	var renderNL = function () {
+		var Lwhite = margin.left  + border.left  + padding.left ;
+		var Rwhite = margin.right + border.right + padding.right;
+		var Lcol   = ((column.count + 0) * column.width);
+		var Rcol   = ((column.count + 1) * column.width);
+
 		var bottom    = margin.bottom - border.bottom - padding .bottom;
 		var maxY      = paper.height - bottom;
 		engine.h = margin.left + border.left + padding.left;
 		engine.v += font[0].size + padding.bottom + padding.top;
 		if (engine.v >= maxY) {
-			newPage ();
+			newColumn ();
 		}
 		word.n = 0;
 	};  // renderNL ()
@@ -289,7 +325,7 @@ window.onload = (function (win, doc) {
 		var I = s.length;
 		if (s[i] == '\x0c') {
 			i++;
-			newPage ();
+			newColumn ();
 		}
 		while (i < I && s[i] == '\n') {
 			renderNL ();
@@ -297,7 +333,7 @@ window.onload = (function (win, doc) {
 			word.n = 0;
 			i++;
 		}
-		if (word.n++ != 0 && H >= paper.width) {
+		if (word.n++ != 0 && H >= engine.H) {
 			renderNL ();
 		}
 		h += space.width;
