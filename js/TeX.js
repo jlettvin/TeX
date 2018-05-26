@@ -23,13 +23,15 @@ window.onload = (function (win, doc) {
 	var margin   = { top: 50, bottom: 10, left: 50, right: 50 };
 	var border   = { top:  0, bottom:  0, left:  0, right:  0 };
 	var padding  = { top:  0, bottom:  3, left:  0, right:  0 };
+	var fontface = ["Crete Round", "Neuton", "Barlow", "Raleway", "Montserrat"];
+	var fontnum  = 0;
 	var font     = [
-		{ size: 14, face: '16px Crete Round' },
-		{ size: 14, face: 'Italic 16px Crete Round' },
-		{ size: 20, face: '20px Crete Round' },
-		{ size: 20, face: 'Italic 20px Crete Round'}
+		{ size: 16, face:        '16px ' + fontface[fontnum] },
+		{ size: 16, face: 'Italic 16px ' + fontface[fontnum] },
+		//{ size: 16, face: '16pt '        + fontface[fontnum] },
+		//{ size: 16, face: 'Italic 16pt'  + fontface[fontnum] },
 	];
-	var page     = { number: 0, numbers: false, canvas: null, ctx: null, align: 'C' };
+	var page     = { number: 0, numbers: true, canvas: null, ctx: null, align: 'C' };
 	var line     = { height: font[0].size + padding.top + padding.bottom, text: '' };
 	var data     = { source: '', target: '', index: 0, ok: true };
 	var word     = { n: 0 };
@@ -76,7 +78,8 @@ window.onload = (function (win, doc) {
 	// KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK
 	var newTeXreplacements = [
 		// Note: ".*?" means reluctant match (opposite of greedy)
-		[/^%.*$/gim                           , ''],
+		[/\\%/gim                             , 'PeRcEnT'],
+		[/%[\s\S]*?\n/gim                     , ' '],
 		[/\\documentclass(\[.*?\])?{(.*?)}/gim, ''],
 		[/\\chapter{(.*?)}/gim                , ''],
 		[/\\begin{(.*?)}/gim                  , ''],
@@ -85,15 +88,18 @@ window.onload = (function (win, doc) {
 		[/\s+/gim                             , ' '],
 		[/\\newpage/gim                       , '\x0c'],
 		[/\\it{(.*?)}/gim                     , '$1'],
-		[/\\par/gim                           , '\n\n   '],
+		[/\\par\s+/gim                        , '\n\n   '],
 		[/\\title{(.*?)}/gim                  , '\n\n   $1'],
 		[/\\subtitle{(.*?)}/gim               , '\n\n   $1'],
 		[/\\subsubtitle{(.*?)}/gim            , '\n\n   $1'],
+		[/\\subsubsubtitle{(.*?)}/gim         , '\n\n   $1'],
 		[/\\section{(.*?)}/gim                , '\n\n   $1'],
 		[/\\subsection{(.*?)}/gim             , '\n\n   $1'],
 		[/\\subsubsection{(.*?)}/gim          , '\n\n   $1'],
 		[/\\references/gim                    , '\n\n   '],
 		[/\\\\/gim                            , '\n'],
+		[/\. +/gim                            , '.  '],
+		[/PeRcEnT/gim                         , '%'],
 	];
 
 	// ()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()()
@@ -162,10 +168,19 @@ window.onload = (function (win, doc) {
 	var buttons = function () {
 		doc.jlettvin.TeX.refresh = true;
 
-		var td1 = doc.createElement ('td');
+		var td1              = doc.createElement ('td');
 		var stop             = doc.createElement ('button');
-		stop.innerHTML       = 'stop';
+		var abbrStop         = '' +
+			'<abbr title=' +
+			'"Toggle between refresh (poll) and unchanging (stop)"' +
+			'>stop</abbr>';
+		var abbrPoll         = '' +
+			'<abbr title=' +
+			'"Toggle between refresh (poll) and unchanging (stop)"' +
+			'>stop</abbr>';
+		stop.innerHTML       = abbrStop;
 		stop.setAttribute    ('id', 'stopRefresh');
+		stop.setAttribute    ('abbr', 'refresh toggle');
 		stop.setAttribute    ('onClick',
 			'(function () {' +
 			' var refresh = !document.jlettvin.TeX.refresh;' +
@@ -176,7 +191,9 @@ window.onload = (function (win, doc) {
 			'   location.reload ();' +
 			' }' +
 			' var e = document.getElementById ("stopRefresh");' +
-			' e.innerHTML = refresh ? "stop" : "poll";' +
+			' e.innerHTML = refresh ? "' + 'stop' +
+			'" : "' + 'poll' +
+			'";' +
 			';' +
 			'}) ();'
 		);
@@ -184,7 +201,10 @@ window.onload = (function (win, doc) {
 
 		var td2 = doc.createElement ('td');
 		var print            = doc.createElement ('button');
-		print.innerHTML      = 'print';
+		//print.innerHTML      = 'print';
+		print.innerHTML       = '<abbr title=' +
+			'"Open print dialog for browser"' +
+			'>print</abbr>';
 		print.setAttribute   ('onClick', 'window.print()');
 		print.setAttribute   ('class', 'no-print');
 		td1.appendChild (print);
@@ -252,6 +272,8 @@ window.onload = (function (win, doc) {
 
 		page.canvas   = doc.createElement      ('canvas');
 		page.ctx      = page.canvas.getContext ('2d');
+
+		page.canvas.innerHTML = "Use a browser which supports HTML5 canvas.";
 
 		engine.h      = Lwhite;
 		engine.H      = paper.width - Rwhite;
